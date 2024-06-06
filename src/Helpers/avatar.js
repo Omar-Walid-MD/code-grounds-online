@@ -2,7 +2,7 @@
 const Canvas = require("canvas");
 
 
-export function generateAvatar()
+export const generateAvatar = function()
 {
     const pixels = [10,10];
     const pixelSize = 10;
