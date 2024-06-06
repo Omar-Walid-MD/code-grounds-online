@@ -10,10 +10,11 @@ const server = http.createServer(app);
 
 const io = new Server(server,{
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET","POST"]
   }
-});
+}
+);
 
 server.listen(8000,()=>{
   console.log("Server is listening on port: 8000");

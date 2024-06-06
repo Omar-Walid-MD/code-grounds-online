@@ -36,7 +36,7 @@ function WaitingRoom({gameMode}) {
     useEffect(()=>{
         if(waitingRoom)
         {
-            if(waitingRoom.users.length >= 2)
+            if(waitingRoom.users.length >= 5)
             {
                 if(!timerStarted) setTimerStarted(true);
 
