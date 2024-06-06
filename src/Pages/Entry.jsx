@@ -5,7 +5,7 @@ import { setUser } from '../Store/Auth/authSlice';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
-// import { generateAvatar } from '../Helpers/avatar';
+import { generateAvatar } from '../Helpers/avatar';
 
 function Entry({}) {
 
@@ -24,7 +24,7 @@ function Entry({}) {
             const user = {
                 userId: uuidv4(),
                 username,
-                avatar: null//generateAvatar()
+                avatar: generateAvatar()
             };
 
             dispatch(setUser(user));
