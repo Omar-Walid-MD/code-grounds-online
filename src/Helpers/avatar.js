@@ -2,7 +2,7 @@
 const Canvas = require("canvas");
 
 
-function generateAvatar()
+export function generateAvatar()
 {
     const pixels = [10,10];
     const pixelSize = 10;
@@ -33,4 +33,4 @@ function generateAvatar()
     return imageData;
 }
 
-module.exports = {generateAvatar};
+// module.exports = {generateAvatar};
