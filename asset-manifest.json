@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/code-grounds-online/static/css/main.fa99a3c2.css",
-    "main.js": "/code-grounds-online/static/js/main.dd824397.js",
+    "main.js": "/code-grounds-online/static/js/main.b6f3d3bc.js",
     "static/js/787.28cb0dcd.chunk.js": "/code-grounds-online/static/js/787.28cb0dcd.chunk.js",
     "static/media/logo.png": "/code-grounds-online/static/media/logo.db39add98e60d2566bb2.png",
     "index.html": "/code-grounds-online/index.html",
     "main.fa99a3c2.css.map": "/code-grounds-online/static/css/main.fa99a3c2.css.map",
-    "main.dd824397.js.map": "/code-grounds-online/static/js/main.dd824397.js.map",
+    "main.b6f3d3bc.js.map": "/code-grounds-online/static/js/main.b6f3d3bc.js.map",
     "787.28cb0dcd.chunk.js.map": "/code-grounds-online/static/js/787.28cb0dcd.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.fa99a3c2.css",
-    "static/js/main.dd824397.js"
+    "static/js/main.b6f3d3bc.js"
   ]
 }
