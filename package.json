@@ -32,7 +32,7 @@
   "scripts": {
     "start": "concurrently npm:run:*",
     "run:start": "react-scripts start",
-    "run:serve": "nodemon ./backend/index.js",
+    "run:serve": "node ./backend/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
