@@ -36,7 +36,7 @@ function WaitingRoom({gameMode}) {
     useEffect(()=>{
         if(waitingRoom)
         {
-            if(waitingRoom.users.length >= 5)
+            if(waitingRoom.users.length >= 3)
             {
                 if(!timerStarted) setTimerStarted(true);
 
@@ -83,16 +83,16 @@ function WaitingRoom({gameMode}) {
             <div className='d-flex  w-100 flex-column align-items-start'>
                 <p className='fs-5'>const players = [</p>
 
-                <Row className='align-self-center'>
+                <Row className='g-3 align-self-center'>
                 {
                     waitingRoom &&
                     waitingRoom.users.map((waitingUser,index)=>
 
                     <Col key={waitingUser.userId}>
-                        <div className="d-flex gap-3 align-items-end">
-                            <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser.userId ===user.userId ? "border-bottom border-4 border-white" : ""}`}>
+                        <div className="d-flex gap-2 align-items-end">
+                            <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
                                 <img
-                                className='user-avatar border-4'
+                                className={`user-avatar border-4 border-white ${waitingUser.userId !== user.userId ? "border" : ""}`}
                                 src={waitingUser.avatar}
                                 style={{height:70}}
                                 />

@@ -63,7 +63,10 @@
   font-family: monospace !important;
 }
 
-
+.entry-form-containter 
+{
+  width: min(500px,calc(100vw - 40px));
+}
 .time-bar-bg
 {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -73,6 +76,7 @@
   height: 10;
   transition: width 0.2s;
 }
+
 
 .error-message
 {

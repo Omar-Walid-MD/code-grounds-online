@@ -30,7 +30,7 @@ function Quiz({}) {
     const [inputValues,setInputValues] = useState(questions.map((x,i)=>"1\n"));
     const [outputValues,setOutputValues] = useState(questions.map((x,i)=>""));
 
-    const fullTime = 125;
+    const fullTime = 15;
     const [timeLeft,setTimeLeft] = useState(fullTime);
 
     const [resultLoading,setResultLoading] = useState(false);
@@ -294,7 +294,10 @@ function Quiz({}) {
                                 <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
                                     <Button className='w-100 fs-5 rounded-0 bg-dark border-0'
                                     style={{color:"unset"}}
-                                    onClick={()=>setQuestionIndex(i)}
+                                    onClick={()=>{
+                                        setQuestionIndex(i);
+                                        setCurrentTab(0);
+                                    }}
                                     >
                                     {question.title}
                                     </Button>
@@ -417,8 +420,8 @@ function Quiz({}) {
             {
                 resultModal === "correct" ?
                 <>
-                    <IoCheckboxSharp className='scale-in text-success' size={100} />
-                    <p className='text-success fs-5 fw-semibold'>Correct Answer! Great job!</p>
+                    <IoCheckboxSharp className='scale-in text-accent' size={100} />
+                    <p className='text-accent fs-5 fw-semibold'>Correct Answer! Great job!</p>
                 </>
                 : resultModal === "incorrect" ?
                 <>
@@ -427,8 +430,8 @@ function Quiz({}) {
                 </>
                 : resultModal === "end" && playingRoom.results &&
                 <>
-                    {timeLeft <= 0 && <p className='text-success fs-5 fw-semibold'>Time is up!</p>}
-                    <p className='text-success fs-5 fw-semibold'>{getRankingString(playingRoom.results)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results)} place`}</p>
+                    {timeLeft <= 0 && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                    <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results)} place`}</p>
                 {
                     getSortedRankings(playingRoom.results).map((playingUser,i)=>
 
