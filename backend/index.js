@@ -86,6 +86,20 @@ io.on("connection",(socket)=>{
 
   });
 
+  //SET ROOM START TIME
+  socket.on("set_room_start",(data)=>{
+
+    const room = rooms.find((r) => r.id === data.roomId);
+    if(room)
+    {
+      if((room.startTime && !data.startTime) || (!room.startTime && data.startTime))
+      {
+        rooms = rooms.map((r) => r.id === data.roomId ? {...r,startTime: data.startTime} : r);
+      }
+      io.to(data.roomId).emit("get_room",rooms.find((r) => r.id === data.roomId));
+    }
+
+  });
   //UPDATE USER IN ROOM
   socket.on("update_user_in_room",(data)=>{
     const room = rooms.find((r) => r.id === data.roomId);

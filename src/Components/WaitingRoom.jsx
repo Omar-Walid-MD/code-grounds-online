@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import useWebSocket from 'react-use-websocket';
 import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSlice';
 import { useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 
-function WaitingRoom({gameMode}) {
+const minPlayers = 3;
+
+function WaitingRoom({gameMode, leaveRoom}) {
     
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -36,9 +38,20 @@ function WaitingRoom({gameMode}) {
     useEffect(()=>{
         if(waitingRoom)
         {
-            if(waitingRoom.users.length >= 3)
+            if(waitingRoom.users.length >= minPlayers)
             {
-                if(!timerStarted) setTimerStarted(true);
+                if(!timerStarted)
+                {
+                    setTimerStarted(true);
+                    if(!waitingRoom.startTime)
+                    {
+                        console.log(waitingRoom.id);
+                        socket.emit("set_room_start",{
+                            roomId: waitingRoom.id,
+                            startTime: Date.now() + 10 * 1000
+                        });
+                    }
+                }    
 
                 if(waitingRoom.state === "running")
                 {
@@ -47,8 +60,14 @@ function WaitingRoom({gameMode}) {
             }
             else if(timerStarted)
             {
-
                 setTimerStarted(false);
+                if(waitingRoom.startTime)
+                {
+                    socket.emit("set_room_start",{
+                        roomId: waitingRoom.id,
+                        startTime: null
+                    })
+                }
             }
         }
 
@@ -74,14 +93,21 @@ function WaitingRoom({gameMode}) {
     return (
         <Container className='d-flex flex-column align-items-center gap-3'>
             <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{waitingRoom.gameMode}</span>}&#125; Game</h2>
+            <div className='d-flex align-items-start justify-content-between'>
             {
                 timerStarted ? 
                 <WaitingTimer waitingRoom={waitingRoom} />
                 : <h4 className='text-accent loading'>Waiting for more players...</h4>
             }
+            </div>
             <hr className='w-75 border-3 mt-0'/>
-            <div className='d-flex  w-100 flex-column align-items-start'>
-                <p className='fs-5'>const players = [</p>
+            <div className='d-flex w-100 flex-column align-items-start'>
+                <p className='fs-5'>
+                    <span style={{color:"lightskyblue"}}>const</span>
+                    <span style={{color:"#ffffba"}}> players</span>
+                    <span> =</span>
+                    <span style={{color:"#ff99ff"}}> [</span>
+                </p>
 
                 <Row className='g-3 align-self-center'>
                 {
@@ -105,9 +131,15 @@ function WaitingRoom({gameMode}) {
                 }
                 </Row>
 
-                <p className='fs-5'>];</p>
+                <p className='fs-5'>
+                    <span style={{color:"#ff99ff"}}>]</span>;
+                </p>
             </div>
-           
+            <div className='w-100 d-flex justify-content-start mt-5'>
+                <Button className='main-button arrow danger'
+                onClick={()=>leaveRoom()}
+                >Leave</Button>
+            </div>
         </Container>
     );
 }
@@ -115,39 +147,41 @@ function WaitingRoom({gameMode}) {
 
 function WaitingTimer({waitingRoom})
 {
-    const fullTime = 5;
-    const [startTime,setStartTime] = useState(Date.now());
-    const [timeLeft,setTimeLeft] = useState(fullTime);
-
-    console.log(timeLeft);
+    const [timeLeft,setTimeLeft] = useState(10);
 
     useEffect(()=>{
 
-        let timer = setInterval(() => {
-            if(timeLeft <= 0)
-            {
-                clearInterval(timer);
-                console.log("time up");
-                socket.emit("update_room",{
-                    roomId: waitingRoom.id,
-                    update: {
-                        state: "running",
-                        startTime: Date.now()
-                    }
-                });
+        let timer = null;
+        if(waitingRoom && waitingRoom.startTime)
+        {
+            console.log("timer should start")
+            timer = setInterval(() => {
+                if(timeLeft <= 0)
+                {
+                    clearInterval(timer);
+                    console.log("time up");
+                    socket.emit("update_room",{
+                        roomId: waitingRoom.id,
+                        update: {
+                            state: "running",
+                        }
+                    });
+    
+                }
+                else
+                {
+                    const newTimeLeft = Math.max((waitingRoom.startTime-Date.now())/1000,0);
+                    console.log(waitingRoom.startTime);
+                    setTimeLeft(newTimeLeft);
+    
+                }
+            }, 1000);
+        }
 
-            }
-            else
-            {
-                const newTimeLeft = Math.max(fullTime - (Date.now()-startTime)/1000,0);
-                setTimeLeft(newTimeLeft);
-
-            }
-        }, 1000);
             
 
         return ()=> {clearInterval(timer);};
-    },[timeLeft]);
+    },[waitingRoom,timeLeft]);
 
     return (
         <div>

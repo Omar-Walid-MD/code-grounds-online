@@ -17,17 +17,15 @@ function NavBar({}) {
             <img src={require("../assets/logo.png")} style={{height:30}} />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse className=' justify-content-end' id="basic-navbar-nav">
-            <Nav className="">
-            {
-                user &&
-                <div className='main-bg d-flex gap-3 align-items-center pe-3 border-bottom border-white border-3'>
-                    <img src={user.avatar} className='user-avatar' style={{height:30}}/>
-                    <p className='m-0 fs-5'>{user.username}</p>
-                </div>
-            }
-            </Nav>
-          </Navbar.Collapse>
+          <Nav className="">
+          {
+              user &&
+              <div className='main-bg d-flex gap-3 align-items-center pe-3 border-bottom border-white border-3'>
+                  <img src={user.avatar} className='user-avatar' style={{height:30}}/>
+                  <p className='m-0 fs-5'>{user.username}</p>
+              </div>
+          }
+          </Nav>
         </Container>
     </Navbar>
     );

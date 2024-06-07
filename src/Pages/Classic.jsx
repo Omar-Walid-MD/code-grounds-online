@@ -17,6 +17,8 @@ import { useLocation, useNavigate } from 'react-router';
 import CodeEditor from '../Components/CodeEditor';
 import { games } from '../Games/games';
 
+const fullTime = 5 * 60;
+
 function Quiz({}) {
 
     const [quizState,setQuizState] = useState("running");
@@ -30,7 +32,6 @@ function Quiz({}) {
     const [inputValues,setInputValues] = useState(questions.map((x,i)=>"1\n"));
     const [outputValues,setOutputValues] = useState(questions.map((x,i)=>""));
 
-    const fullTime = 15;
     const [timeLeft,setTimeLeft] = useState(fullTime);
 
     const [resultLoading,setResultLoading] = useState(false);
@@ -255,13 +256,13 @@ function Quiz({}) {
                         <Col className='col-4 p-2'>
                             <div className="d-flex w-100 flex-column align-items-center gap-2">
                                 <div className="d-flex gap-2 align-items-center">
-                                    <MdHourglassBottom className='text-s' size={25}/>
+                                    <MdHourglassBottom className={timeLeft >= 60 ? "text-s" : "text-d time-up-icon"} size={25}/>
                                     <p className='m-0 fs-5'>
                                         {("0"+Math.floor(timeLeft/60)).slice(-2)}:{("0"+Math.floor(timeLeft%60)).slice(-2)}
                                     </p>
                                 </div>
                                 <div className="w-100 time-bar-bg bg-white overflow-hidden">
-                                    <div className='secondary-bg time-bar-fill' style={{height:5,width:`${timeLeft/fullTime*100}%`}}></div>
+                                    <div className={`${timeLeft >= 60 ? "secondary-bg": "danger-bg"} time-bar-fill`} style={{height:5,width:`${timeLeft/fullTime*100}%`}}></div>
                                 </div>
                             </div>
                         </Col>
@@ -280,7 +281,7 @@ function Quiz({}) {
 
 
                     <div className='w-100'>
-                        <p className="fs-4 text-bright mb-1">Questions:</p>
+                        <p className="fs-5 text-bright mb-1">Questions</p>
                         <div className="questions-scroll overflow-x-scroll mb-3"
                         onWheel={(e)=>{
                             e.currentTarget.scrollTo({left:e.currentTarget.scrollLeft + Math.sign(e.deltaY)*100});

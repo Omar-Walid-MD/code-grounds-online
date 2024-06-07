@@ -21,6 +21,7 @@
 
   --danger: rgb(165, 10, 10);
   --danger-hover: rgb(135, 8, 8);
+
 }
 
 .main-bg
@@ -123,10 +124,17 @@
 }
 
 @keyframes time-up-animation {
+  0% {transform: rotate(0);}
+  25% {transform: rotate(20deg);}
+  50% {transform: rotate(-20deg);}
+  75% {transform: rotate(0);}
+}
+
+/* @keyframes time-up-animation {
   0% {transform: rotate(-20deg);}
   50% {transform: rotate(20deg);}
   100% {transform: rotate(-20deg);} 
-}
+} */
 
 
 .questions-progress-container

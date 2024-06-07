@@ -16,6 +16,14 @@ function Entry({}) {
 
     const user = useSelector(store => store.auth.user);
 
+    function handleUsername(e)
+    {
+        if(e.target.value.length <= 20)
+        {
+            setUsername(e.target.value);
+        }
+    }
+
     function userEnter(e)
     {
         e.preventDefault();
@@ -23,7 +31,7 @@ function Entry({}) {
         {
             const user = {
                 userId: uuidv4(),
-                username,
+                username: username.trim(),
                 avatar: generateAvatar()
             };
 
@@ -43,7 +51,7 @@ function Entry({}) {
         <div className='page-container d-flex flex-column align-items-center justify-content-center'>
             <form className="entry-form-containter d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
                 <input className='main-input fs-4 w-100' type="text" placeholder='<Enter your name>'
-                value={username} onChange={(e)=>setUsername(e.target.value)}/>
+                value={username} onChange={handleUsername}/>
                 <Button type='submit' className='main-button arrow w-100' disabled={!username}>Join</Button>
             </form>
         </div>

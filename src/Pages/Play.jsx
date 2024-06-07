@@ -15,12 +15,16 @@ function Play({}) {
 
     const navigate = useNavigate();
 
+    function leaveRoom()
+    {
+        setWaiting(false);
+    }
+
     useEffect(()=>{
         if(!loading)
         {
             if(!user) navigate("/");
         }
-        console.log(loading);
     },[loading,user]);
 
 
@@ -28,7 +32,7 @@ function Play({}) {
         <div className='page-container font-mono text-white d-flex flex-column justify-content-center align-items-center'>
             {
                 waiting ?
-                <WaitingRoom gameMode={gameMode}/>
+                <WaitingRoom gameMode={gameMode} leaveRoom={leaveRoom}/>
                 :
                 <Container className='d-flex flex-column align-items-center justify-content-center gap-2'>
                     <h1>Choose Game</h1>
