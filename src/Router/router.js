@@ -2,9 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import Editor from "../Pages/Editor";
 import Play from "../Pages/Play";
-import Classic from "../Pages/Classic";
-import Entry from "../Pages/Entry";
+import Home from "../Pages/Home";
 import Main from "../Layout/Main";
+import WaitingRoom from "../Pages/WaitingRoom";
 
 const router = createBrowserRouter([
     {
@@ -17,7 +17,12 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "",
-                        element: <Entry/>,
+                        element: <Home/>,
+                        children: []
+                    },
+                    {
+                        path: "/wait",
+                        element: <WaitingRoom />,
                         children: []
                     },
                     {
@@ -31,11 +36,6 @@ const router = createBrowserRouter([
             {
                 path: "editor",
                 element: <Editor />,
-                children: []
-            },
-            {
-                path: "classic",
-                element: <Classic />,
                 children: []
             }
         ]

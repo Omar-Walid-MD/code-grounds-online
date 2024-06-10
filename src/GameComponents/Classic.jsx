@@ -21,14 +21,12 @@ function Quiz({}) {
 
     const [quizState,setQuizState] = useState("running");
     const [questionIndex,setQuestionIndex] = useState(0);
-    const [questionLoading,setQuestionLoading] = useState(false);
 
     const [questions,setQuestions] = useState();
 
     const [currentTab,setCurrentTab] = useState(0);
     
     const [timeLeft,setTimeLeft] = useState(fullTime);
-
 
     const [resultModal, setResultModal] = useState("");
 

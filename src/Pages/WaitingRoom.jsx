@@ -3,18 +3,20 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import useWebSocket from 'react-use-websocket';
 import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSlice';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 
 const minPlayers = 1;
 const waitingSeconds = 3;
 
-function WaitingRoom({gameMode, leaveRoom}) {
+function WaitingRoom({}) {
     
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const user = useSelector(store => store.auth.user);
+
+    const gameMode = useLocation().state?.gameMode;
 
     const [waitingRoom,setWaitingRoom] = useState();
     const waitingRoomRef = useRef(waitingRoom);
@@ -22,11 +24,15 @@ function WaitingRoom({gameMode, leaveRoom}) {
     const [timerStarted,setTimerStarted] = useState(false);
 
     useEffect(()=>{
-        socket.emit("join_room",{
-            gameMode,
-            user
-        });
-        console.log("sent socket")
+        if(gameMode)
+        {
+            socket.emit("join_room",{
+                gameMode,
+                user
+            });
+            console.log("sent socket")
+        }
+        else navigate("/");
     },[]);
 
     useEffect(()=>{
@@ -56,7 +62,7 @@ function WaitingRoom({gameMode, leaveRoom}) {
 
                 if(waitingRoom.state === "running")
                 {
-                    navigate(`/${gameMode}`,{state:{roomId:waitingRoom.id}});
+                    navigate(`/play`,{state:{gameMode,roomId:waitingRoom.id}});
                 }
             }
             else if(timerStarted)
@@ -92,56 +98,58 @@ function WaitingRoom({gameMode, leaveRoom}) {
     
 
     return (
-        <Container className='d-flex flex-column align-items-center gap-3'>
-            <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{waitingRoom.gameMode}</span>}&#125; Game</h2>
-            <div className='d-flex align-items-start justify-content-between'>
-            {
-                timerStarted ? 
-                <WaitingTimer waitingRoom={waitingRoom} />
-                : <h4 className='text-accent loading'>Waiting for more players...</h4>
-            }
-            </div>
-            <hr className='w-75 border-3 mt-0'/>
-            <div className='d-flex w-100 flex-column align-items-start'>
-                <p className='fs-5'>
-                    <span style={{color:"lightskyblue"}}>const</span>
-                    <span style={{color:"#ffffba"}}> players</span>
-                    <span> =</span>
-                    <span style={{color:"#ff99ff"}}> [</span>
-                </p>
-
-                <Row className='g-3 align-self-center'>
+        <div className='page-container font-mono text-white d-flex flex-column justify-content-center align-items-center'>
+            <Container className='d-flex flex-column align-items-center gap-3'>
+                <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{waitingRoom.gameMode}</span>}&#125; Game</h2>
+                <div className='d-flex align-items-start justify-content-between'>
                 {
-                    waitingRoom &&
-                    waitingRoom.users.map((waitingUser,index)=>
-
-                    <Col key={waitingUser.userId}>
-                        <div className="d-flex gap-2 align-items-end">
-                            <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
-                                <img
-                                className={`user-avatar border-4 border-white ${waitingUser.userId !== user.userId ? "border" : ""}`}
-                                src={waitingUser.avatar}
-                                style={{height:70}}
-                                />
-                                <h3 className='m-0'>{waitingUser.username}</h3>
-                            </div>
-                            {index !== waitingRoom.users.length-1 &&  <p className='m-0 fs-5'>,</p>}
-                        </div>
-                    </Col>
-                    )
+                    timerStarted ? 
+                    <WaitingTimer waitingRoom={waitingRoom} />
+                    : <h4 className='text-accent loading'>Waiting for more players...</h4>
                 }
-                </Row>
+                </div>
+                <hr className='w-75 border-3 mt-0'/>
+                <div className='d-flex w-100 flex-column align-items-start'>
+                    <p className='fs-5'>
+                        <span style={{color:"lightskyblue"}}>const</span>
+                        <span style={{color:"#ffffba"}}> players</span>
+                        <span> =</span>
+                        <span style={{color:"#ff99ff"}}> [</span>
+                    </p>
 
-                <p className='fs-5'>
-                    <span style={{color:"#ff99ff"}}>]</span>;
-                </p>
-            </div>
-            <div className='w-100 d-flex justify-content-start mt-5'>
-                <Button className='main-button arrow danger'
-                onClick={()=>leaveRoom()}
-                >Leave</Button>
-            </div>
-        </Container>
+                    <Row className='g-3 align-self-center'>
+                    {
+                        waitingRoom &&
+                        waitingRoom.users.map((waitingUser,index)=>
+
+                        <Col key={waitingUser.userId}>
+                            <div className="d-flex gap-2 align-items-end">
+                                <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
+                                    <img
+                                    className={`user-avatar border-4 border-white ${waitingUser.userId !== user.userId ? "border" : ""}`}
+                                    src={waitingUser.avatar}
+                                    style={{height:70}}
+                                    />
+                                    <h3 className='m-0'>{waitingUser.username}</h3>
+                                </div>
+                                {index !== waitingRoom.users.length-1 &&  <p className='m-0 fs-5'>,</p>}
+                            </div>
+                        </Col>
+                        )
+                    }
+                    </Row>
+
+                    <p className='fs-5'>
+                        <span style={{color:"#ff99ff"}}>]</span>;
+                    </p>
+                </div>
+                <div className='w-100 d-flex justify-content-start mt-5'>
+                    <Button className='main-button arrow danger'
+                    onClick={()=>navigate("/")}
+                    >Leave</Button>
+                </div>
+            </Container>
+        </div>
     );
 }
 

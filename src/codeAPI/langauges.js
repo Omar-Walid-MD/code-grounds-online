@@ -35,19 +35,19 @@ export const codeSnippets = {
     "javascript":
 `process.stdin.on("data",(data)=>{
     const lines = data.toString().trim().split("\\n");
-    const n = lines[0];
-    const inputValues = lines.slice(1,lines.length);
+    const values = lines.slice(1,lines.length);
     
-    for(let i = 0; i < n; i++)
+    for(let i = 0; i < lines[0]; i++)
     {
-        console.log(inputValues[i]);
+        const value = values[i];
     }
 })`,
     "python":
 
 `if __name__ == '__main__':
     for i in range(int(input(""))):
-        `,
+        value = input("")
+`,
     "java":
 
 `import java.util.*;
@@ -58,7 +58,7 @@ public class MainClass {
 		int n = s.nextInt();
         while(n-- > 0)
         {
-			
+			String v = s.next();
         }
         
     }
