@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const {Server} = require("socket.io");
+const { getQuestions } = require("../src/questions/questions");
 const uuid4 = require("uuid").v4;
 
 const app = express();
@@ -100,6 +101,30 @@ io.on("connection",(socket)=>{
     }
 
   });
+
+  //START ROOM
+  socket.on("start_room",(data)=>{
+
+    const room = rooms.find((r) => r.id === data.roomId);
+    if(room && room.state !== "running")
+    {
+      console.log("started room");
+      rooms = rooms.map((r) => r.id === data.roomId ?
+      {...r,
+        state: "running",
+        questions: getQuestions(5)
+      }
+       : r);
+
+    }
+    io.to(data.roomId).emit("get_room",rooms.find((r) => r.id === data.roomId));
+
+
+  });
+
+
+
+
   //UPDATE USER IN ROOM
   socket.on("update_user_in_room",(data)=>{
     const room = rooms.find((r) => r.id === data.roomId);

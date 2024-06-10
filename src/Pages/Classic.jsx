@@ -3,7 +3,7 @@ import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput, testCode } from '../codeAPI/api';
 import { codeSnippets, languages, questionLoopCode, wrapCode } from '../codeAPI/langauges';
 import LanguageSelect from '../Components/LanguageSelect';
-import { answers, questions } from '../questions/questions';
+import { answers, getQuestions } from '../questions/questions';
 
 import { MdWarning } from "react-icons/md";
 import { MdHourglassBottom } from "react-icons/md";
@@ -25,12 +25,14 @@ function Quiz({}) {
     const [questionIndex,setQuestionIndex] = useState(0);
     const [questionLoading,setQuestionLoading] = useState(false);
 
-    const [languageValues,setLanguageValues] = useState(questions.map((q)=>languages[0]));
-    const [codeValues,setCodeValues] = useState(questions.map((q)=>codeSnippets["python"])); //useState(questions.map((q)=>"")); 
-    const [currentTab,setCurrentTab] = useState(0);
+    const [questions,setQuestions] = useState();
 
-    const [inputValues,setInputValues] = useState(questions.map((x,i)=>"1\n"));
-    const [outputValues,setOutputValues] = useState(questions.map((x,i)=>""));
+    const [currentTab,setCurrentTab] = useState(0);
+    
+    const [languageValues,setLanguageValues] = useState([]);
+    const [codeValues,setCodeValues] = useState([]);
+    const [inputValues,setInputValues] = useState([]);
+    const [outputValues,setOutputValues] = useState([]);
 
     const [timeLeft,setTimeLeft] = useState(fullTime);
 
@@ -114,15 +116,7 @@ function Quiz({}) {
         setResultLoading(false);
     }
 
-    function resetQuiz()
-    {
-        setQuestionIndex(0);
-        setQuizState("start");
-        setResultModal("");
-        setTimeLeft(fullTime);
-        handleCodeValue("");
-    }
-
+   
     function getSortedRankings(playingUsers)
     {
         playingUsers = [...playingUsers];
@@ -196,17 +190,32 @@ function Quiz({}) {
 
             if(room)
             {
-                room.users.forEach((user)=>{
-                    if(user.state)
-                    {
-                        if(user.state.solvedQuestions.length === questions.length)
+                if(questions)
+                {
+                    room.users.forEach((user)=>{
+                        if(user.state)
                         {
-                            setQuizState("results");
-                            setResultModal("end");
-                            console.log("here ending");
+                            if(user.state.solvedQuestions.length === questions.length)
+                            {
+                                setQuizState("results");
+                                setResultModal("end");
+                                console.log("here ending");
+                            }
                         }
+                    });
+                }
+                else
+                {
+                    if(room.questions)
+                    {
+                        setQuestions(room.questions);
+                        setLanguageValues(room.questions.map((q)=>languages[0]));
+                        setCodeValues(room.questions.map((q)=>codeSnippets["python"]));
+                        setInputValues(room.questions.map((x,i)=>"1\n"));
+                        setOutputValues(room.questions.map((x,i)=>""));
                     }
-                })
+                
+                }
             }
         });
 
@@ -272,7 +281,7 @@ function Quiz({}) {
                                     <BiStats size={20} className='me-2'/>
                                     Stats
                                 </Button>
-                                <Button className='main-button arrow danger' onClick={()=>setStatusModal(true)}>
+                                <Button className='main-button arrow danger' onClick={()=>navigate("/play")}>
                                     Leave Game
                                 </Button>
                             </div>
@@ -290,7 +299,7 @@ function Quiz({}) {
 
                             <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
                             {
-                                questions.map((question,i)=>
+                                questions && questions.map((question,i)=>
 
                                 <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
                                     <Button className='w-100 fs-5 rounded-0 bg-dark border-0'
@@ -322,90 +331,92 @@ function Quiz({}) {
                             </div>
                         </div>
                     </div>
-                    
-                    <div className="d-flex flex-column justify-content-start">
-                        <div className="d-flex gap-3 justify-content-start">
-                            <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                            onClick={()=>setCurrentTab(0)}>Question</Button>
-                            <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                            onClick={()=>setCurrentTab(1)}>Code</Button>
-                        </div>
-                        <div className='dark-bg p-3 shadow'>
-                            {
-                                currentTab === 0 ?
-                                <Row>
-                                    <Col className='col-12'>
-                                        <div className="h-100 d-flex flex-column gap-2">
-                                            <div className="h-100 p-3 dark-bg d-flex flex-column align-items-start">
-                                                <p className='fs-4 fw-semibold border-bottom border-white border-3'>{questionIndex+1}. {questions[questionIndex].title}</p>
-                                                <p className='fs-5'>{questions[questionIndex].question}</p>
+                    {
+                        questions &&
+                        <div className="d-flex flex-column justify-content-start">
+                            <div className="d-flex gap-3 justify-content-start">
+                                <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
+                                onClick={()=>setCurrentTab(0)}>Question</Button>
+                                <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
+                                onClick={()=>setCurrentTab(1)}>Code</Button>
+                            </div>
+                            <div className='dark-bg p-3 shadow'>
+                                {
+                                    currentTab === 0 ?
+                                    <Row>
+                                        <Col className='col-12'>
+                                            <div className="h-100 d-flex flex-column gap-2">
+                                                <div className="h-100 p-3 dark-bg d-flex flex-column align-items-start">
+                                                    <p className='fs-4 fw-semibold border-bottom border-white border-3'>{questionIndex+1}. {questions[questionIndex].title}</p>
+                                                    <p className='fs-5'>{questions[questionIndex].question}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Col>
-                                </Row>
-                                : currentTab === 1 &&
-                                <Row className='g-4'>
-                                    <Col className='col-12'>
-                                        <div className="h-100 p-1 d-flex flex-column gap-3">
-                                            <div className="d-flex gap-3">
-                                                <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                                        </Col>
+                                    </Row>
+                                    : currentTab === 1 &&
+                                    <Row className='g-4'>
+                                        <Col className='col-12'>
+                                            <div className="h-100 p-1 d-flex flex-column gap-3">
+                                                <div className="d-flex gap-3">
+                                                    <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                                                    {
+                                                        !testLoading ?
+                                                        <Button className="main-button arrow secondary" onClick={()=>runCode()}>Run Code</Button>
+                                                        :
+                                                        <Button className="main-button secondary px-5 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+                                                    }
+                                                </div>
+
+                                                <Row className='w-100 g-0'>
+
+                                                    <Col className='col-8 pe-3'>
+                                                        <div className='w-100 h-100'>
+                                                            <CodeEditor
+                                                            height="300px"
+                                                            defaultLanguage='python'
+                                                            language={languageValues[questionIndex]}
+                                                            value={codeValues[questionIndex]}
+                                                            onChange={handleCodeValue}
+                                                            />
+                                                        </div>
+                                                    </Col>
+
+                                                    <Col className='col-4 overflow-hidden'>
+                                                        <Row className='g-0'>
+                                                            <Col className='col-12'>
+                                                                <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
+                                                                <textarea className='w-100 textarea-input p-2' style={{height:100,fontSize:"0.85rem"}}
+                                                                value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
+                                                                ></textarea>
+                                                            </Col>
+                                                            <Col className='col-12'>
+                                                                <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
+                                                                <textarea className='w-100 textarea-input p-2' style={{height:129,fontSize:"0.85rem"}}
+                                                                readOnly value={outputValues[questionIndex]}
+                                                                ></textarea>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
                                                 {
-                                                    !testLoading ?
-                                                    <Button className="main-button arrow secondary" onClick={()=>runCode()}>Run Code</Button>
+                                                    !resultLoading ?
+                                                    <Button
+                                                    className="main-button arrow w-100 fs-5"
+                                                    disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
+                                                    onClick={()=>submitAnswer()}
+                                                    >Submit</Button>
                                                     :
-                                                    <Button className="main-button secondary px-5 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+                                                    <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+
                                                 }
                                             </div>
+                                        </Col>
+                                    </Row>
 
-                                            <Row className='w-100 g-0'>
-
-                                                <Col className='col-8 pe-3'>
-                                                    <div className='w-100 h-100'>
-                                                        <CodeEditor
-                                                        height="300px"
-                                                        defaultLanguage='python'
-                                                        language={languageValues[questionIndex]}
-                                                        value={codeValues[questionIndex]}
-                                                        onChange={handleCodeValue}
-                                                        />
-                                                    </div>
-                                                </Col>
-
-                                                <Col className='col-4 overflow-hidden'>
-                                                    <Row className='g-0'>
-                                                        <Col className='col-12'>
-                                                            <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
-                                                            <textarea className='w-100 textarea-input p-2' style={{height:100,fontSize:"0.85rem"}}
-                                                            value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
-                                                            ></textarea>
-                                                        </Col>
-                                                        <Col className='col-12'>
-                                                            <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
-                                                            <textarea className='w-100 textarea-input p-2' style={{height:129,fontSize:"0.85rem"}}
-                                                            readOnly value={outputValues[questionIndex]}
-                                                            ></textarea>
-                                                        </Col>
-                                                    </Row>
-                                                </Col>
-                                            </Row>
-                                            {
-                                                !resultLoading ?
-                                                <Button
-                                                className="main-button arrow w-100 fs-5"
-                                                disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
-                                                onClick={()=>submitAnswer()}
-                                                >Submit</Button>
-                                                :
-                                                <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
-
-                                            }
-                                        </div>
-                                    </Col>
-                                </Row>
-
-                            }
+                                }
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             }
             </Container>
@@ -501,7 +512,7 @@ function Quiz({}) {
                     <Row className='w-100'>
                         <Col className='col-3'></Col>
                         {
-                            questions.map((question)=>
+                            questions && questions.map((question)=>
                             <Col className='text-center'>{question.title}</Col>
                             )
                         }
@@ -524,7 +535,7 @@ function Quiz({}) {
                             </div>
                         </Col>
                         {
-                            playingUser.state && questions.map((question,i)=>
+                            playingUser.state && questions && questions.map((question,i)=>
                             <Col className='d-flex align-items-center justify-content-center fs-3 text-accent'>{playingUser.state.solvedQuestions.includes(i) ? <FaCheck className='text-bright' /> : "--"}</Col>
                             )
                         }

@@ -6,7 +6,8 @@ import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSl
 import { useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 
-const minPlayers = 3;
+const minPlayers = 2;
+const waitingSeconds = 3;
 
 function WaitingRoom({gameMode, leaveRoom}) {
     
@@ -48,7 +49,7 @@ function WaitingRoom({gameMode, leaveRoom}) {
                         console.log(waitingRoom.id);
                         socket.emit("set_room_start",{
                             roomId: waitingRoom.id,
-                            startTime: Date.now() + 10 * 1000
+                            startTime: Date.now() + waitingSeconds * 1000
                         });
                     }
                 }    
@@ -147,7 +148,7 @@ function WaitingRoom({gameMode, leaveRoom}) {
 
 function WaitingTimer({waitingRoom})
 {
-    const [timeLeft,setTimeLeft] = useState(10);
+    const [timeLeft,setTimeLeft] = useState(waitingSeconds);
 
     useEffect(()=>{
 
@@ -160,11 +161,8 @@ function WaitingTimer({waitingRoom})
                 {
                     clearInterval(timer);
                     console.log("time up");
-                    socket.emit("update_room",{
-                        roomId: waitingRoom.id,
-                        update: {
-                            state: "running",
-                        }
+                    socket.emit("start_room",{
+                        roomId: waitingRoom.id
                     });
     
                 }

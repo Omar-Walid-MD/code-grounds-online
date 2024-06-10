@@ -1,9 +1,9 @@
 export const languages = [
-    // {
-    //     code: "javascript",
-    //     name: "Javascript",
-    //     v: "18.15.0" 
-    // },
+    {
+        code: "javascript",
+        name: "Javascript",
+        v: "18.15.0" 
+    },
     {
         code: "python",
         name: "Python",
