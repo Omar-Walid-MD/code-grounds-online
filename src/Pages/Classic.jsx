@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput, testCode } from '../codeAPI/api';
 import { codeSnippets, languages, questionLoopCode, wrapCode } from '../codeAPI/langauges';
-import LanguageSelect from '../Components/LanguageSelect';
-import { answers, getQuestions } from '../questions/questions';
 
 import { MdWarning } from "react-icons/md";
 import { MdHourglassBottom } from "react-icons/md";
@@ -14,8 +12,8 @@ import { IoCheckboxSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../socketClient/socketClient';
 import { useLocation, useNavigate } from 'react-router';
-import CodeEditor from '../Components/CodeEditor';
 import { games } from '../Games/games';
+import CodeSubmit from '../Components/CodeSubmit';
 
 const fullTime = 5 * 60;
 
@@ -29,15 +27,8 @@ function Quiz({}) {
 
     const [currentTab,setCurrentTab] = useState(0);
     
-    const [languageValues,setLanguageValues] = useState([]);
-    const [codeValues,setCodeValues] = useState([]);
-    const [inputValues,setInputValues] = useState([]);
-    const [outputValues,setOutputValues] = useState([]);
-
     const [timeLeft,setTimeLeft] = useState(fullTime);
 
-    const [resultLoading,setResultLoading] = useState(false);
-    const [testLoading,setTestLoading] = useState(false);
 
     const [resultModal, setResultModal] = useState("");
 
@@ -54,35 +45,8 @@ function Quiz({}) {
 
     const [statusModal, setStatusModal] = useState(false);
 
-    
-    function handleCodeValue(code)
+    async function submitAnswer(codeValues,languageValues,questions)
     {
-        setCodeValues(c => c.map((x,i) => i===questionIndex ? code : x));
-    }
-
-    function handleLanguage(lang)
-    {
-        setLanguageValues(l => l.map((x,i) => i===questionIndex ? lang : x));
-        setCodeValues(c => c.map((x,i) => i===questionIndex ? codeSnippets[lang.code] : x));
-
-    }
-
-    function handleInput(e)
-    {
-        setInputValues(inputs => inputs.map((x,i) => i===questionIndex ? e.target.value : x));
-    }
-
-    async function runCode()
-    {
-        setTestLoading(true);
-        const output = await getCodeOutput(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
-        setOutputValues(o => o.map((x,i) => i===questionIndex ? output.data.run.output : x));
-        setTestLoading(false);    
-    }
-
-    async function submitAnswer()
-    {
-        setResultLoading(true);
         const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
         if(correct)
         {
@@ -113,7 +77,6 @@ function Quiz({}) {
         {
             setResultModal("incorrect");
         }
-        setResultLoading(false);
     }
 
    
@@ -209,10 +172,6 @@ function Quiz({}) {
                     if(room.questions)
                     {
                         setQuestions(room.questions);
-                        setLanguageValues(room.questions.map((q)=>languages[0]));
-                        setCodeValues(room.questions.map((q)=>codeSnippets["python"]));
-                        setInputValues(room.questions.map((x,i)=>"1\n"));
-                        setOutputValues(room.questions.map((x,i)=>""));
                     }
                 
                 }
@@ -342,10 +301,10 @@ function Quiz({}) {
                             </div>
                             <div className='dark-bg p-3 shadow'>
                                 {
-                                    currentTab === 0 ?
+                                    currentTab === 0 &&
                                     <Row>
                                         <Col className='col-12'>
-                                            <div className="h-100 d-flex flex-column gap-2">
+                                            <div className="d-flex flex-column gap-2" style={{height:435}}>
                                                 <div className="h-100 p-3 dark-bg d-flex flex-column align-items-start">
                                                     <p className='fs-4 fw-semibold border-bottom border-white border-3'>{questionIndex+1}. {questions[questionIndex].title}</p>
                                                     <p className='fs-5'>{questions[questionIndex].question}</p>
@@ -353,67 +312,21 @@ function Quiz({}) {
                                             </div>
                                         </Col>
                                     </Row>
-                                    : currentTab === 1 &&
-                                    <Row className='g-4'>
-                                        <Col className='col-12'>
-                                            <div className="h-100 p-1 d-flex flex-column gap-3">
-                                                <div className="d-flex gap-3">
-                                                    <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
-                                                    {
-                                                        !testLoading ?
-                                                        <Button className="main-button arrow secondary" onClick={()=>runCode()}>Run Code</Button>
-                                                        :
-                                                        <Button className="main-button secondary px-5 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
-                                                    }
-                                                </div>
-
-                                                <Row className='w-100 g-0'>
-
-                                                    <Col className='col-8 pe-3'>
-                                                        <div className='w-100 h-100'>
-                                                            <CodeEditor
-                                                            height="300px"
-                                                            defaultLanguage='python'
-                                                            language={languageValues[questionIndex]}
-                                                            value={codeValues[questionIndex]}
-                                                            onChange={handleCodeValue}
-                                                            />
-                                                        </div>
-                                                    </Col>
-
-                                                    <Col className='col-4 overflow-hidden'>
-                                                        <Row className='g-0'>
-                                                            <Col className='col-12'>
-                                                                <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
-                                                                <textarea className='w-100 textarea-input p-2' style={{height:100,fontSize:"0.85rem"}}
-                                                                value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
-                                                                ></textarea>
-                                                            </Col>
-                                                            <Col className='col-12'>
-                                                                <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
-                                                                <textarea className='w-100 textarea-input p-2' style={{height:129,fontSize:"0.85rem"}}
-                                                                readOnly value={outputValues[questionIndex]}
-                                                                ></textarea>
-                                                            </Col>
-                                                        </Row>
-                                                    </Col>
-                                                </Row>
-                                                {
-                                                    !resultLoading ?
-                                                    <Button
-                                                    className="main-button arrow w-100 fs-5"
-                                                    disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
-                                                    onClick={()=>submitAnswer()}
-                                                    >Submit</Button>
-                                                    :
-                                                    <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
-
-                                                }
-                                            </div>
-                                        </Col>
-                                    </Row>
+                                    
 
                                 }
+                                <Row className={`${currentTab === 1 ? "g-4" : "g-0"}`}>
+                                    <Col className='col-12'>
+                                        <CodeSubmit
+                                        visible={currentTab === 1}
+                                        onSubmit={submitAnswer}
+                                        questions={questions}
+                                        questionIndex={questionIndex}
+                                        solvedQuestions={solvedQuestions}
+
+                                        />
+                                    </Col>
+                                </Row>
                             </div>
                         </div>
                     }

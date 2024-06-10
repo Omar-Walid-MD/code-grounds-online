@@ -1,0 +1,119 @@
+import React, { useEffect, useState } from 'react';
+import CodeEditor from '../Components/CodeEditor';
+import LanguageSelect from '../Components/LanguageSelect';
+import { codeSnippets, languages } from '../codeAPI/langauges';
+import { Button, Col, Row, Spinner } from 'react-bootstrap';
+import { getCodeOutput } from '../codeAPI/api';
+
+function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
+
+    const [languageValues,setLanguageValues] = useState([]);
+    const [codeValues,setCodeValues] = useState([]);
+    const [inputValues,setInputValues] = useState([]);
+    const [outputValues,setOutputValues] = useState([]);
+
+    const [testLoading,setTestLoading] = useState(false);
+    const [resultLoading,setResultLoading] = useState(false);
+
+    function handleCodeValue(code)
+    {
+        setCodeValues(c => c.map((x,i) => i===questionIndex ? code : x));
+    }
+
+    function handleLanguage(lang)
+    {
+        setLanguageValues(l => l.map((x,i) => i===questionIndex ? lang : x));
+        setCodeValues(c => c.map((x,i) => i===questionIndex ? codeSnippets[lang.code] : x));
+
+    }
+
+    function handleInput(e)
+    {
+        setInputValues(inputs => inputs.map((x,i) => i===questionIndex ? e.target.value : x));
+    }
+
+    async function runCode()
+    {
+        setTestLoading(true);
+        const output = await getCodeOutput(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
+        setOutputValues(o => o.map((x,i) => i===questionIndex ? output.data.run.output : x));
+        setTestLoading(false);    
+    }
+
+    useEffect(()=>{
+        if(!languageValues.length)
+        {
+            setLanguageValues(questions.map((q)=>languages[1]));
+            setCodeValues(questions.map((q)=>codeSnippets["python"]));
+            setInputValues(questions.map((x,i)=>"1\n"));
+            setOutputValues(questions.map((x,i)=>""));
+        }
+    },[questions]);
+
+
+    return (
+        <div className={`h-100 p-1 ${visible ? "d-flex" : "d-none"} flex-column gap-3`}>
+            <div className="d-flex gap-3">
+                <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                {
+                    !testLoading ?
+                    <Button className="main-button arrow secondary" onClick={()=>runCode()}>Run Code</Button>
+                    :
+                    <Button className="main-button secondary px-5 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+                }
+            </div>
+
+            <Row className='w-100 g-0'>
+
+                <Col className='col-8 pe-3'>
+                    <div className='w-100 h-100'>
+                        {
+                            languageValues.length > 0  &&
+                            <CodeEditor
+                            height="300px"
+                            defaultLanguage='python'
+                            language={languageValues[questionIndex]}
+                            value={codeValues[questionIndex]}
+                            onChange={handleCodeValue}
+                            />
+                        }
+                    </div>
+                </Col>
+
+                <Col className='col-4 overflow-hidden'>
+                    <Row className='g-0'>
+                        <Col className='col-12'>
+                            <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
+                            <textarea className='w-100 textarea-input p-2' style={{height:100,fontSize:"0.85rem"}}
+                            value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
+                            ></textarea>
+                        </Col>
+                        <Col className='col-12'>
+                            <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
+                            <textarea className='w-100 textarea-input p-2' style={{height:129,fontSize:"0.85rem"}}
+                            readOnly value={outputValues[questionIndex]}
+                            ></textarea>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+            {
+                !resultLoading ?
+                <Button
+                className="main-button arrow w-100 fs-5"
+                disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
+                onClick={()=>{
+                    setResultLoading(true);
+                    onSubmit(codeValues,languageValues,questions);
+                    setResultLoading(false);
+                }}
+                >Submit</Button>
+                :
+                <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+
+            }
+        </div>
+    );
+}
+
+export default CodeSubmit;

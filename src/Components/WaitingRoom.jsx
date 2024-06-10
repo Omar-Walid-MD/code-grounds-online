@@ -6,7 +6,7 @@ import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSl
 import { useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 
-const minPlayers = 2;
+const minPlayers = 1;
 const waitingSeconds = 3;
 
 function WaitingRoom({gameMode, leaveRoom}) {

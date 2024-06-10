@@ -1,7 +1,7 @@
 export const languages = [
     {
         code: "javascript",
-        name: "Javascript",
+        name: "JavaScript",
         v: "18.15.0" 
     },
     {
@@ -32,7 +32,17 @@ export const languages = [
 ]
 
 export const codeSnippets = {
-    // "javascript": ``,
+    "javascript":
+`process.stdin.on("data",(data)=>{
+    const lines = data.toString().trim().split("\\n");
+    const n = lines[0];
+    const inputValues = lines.slice(1,lines.length);
+    
+    for(let i = 0; i < n; i++)
+    {
+        console.log(inputValues[i]);
+    }
+})`,
     "python":
 
 `if __name__ == '__main__':
@@ -91,7 +101,7 @@ int main() {
 }
 
 const codeWrappers = {
-    // "javascript": ["",""],
+    "javascript": ["",""],
     "python": [`if __name__ == '__main__':\n`,""],
     "java": [`public class MainClass {public static void main(String[] args){`,"}}"],
     "csharp": [`using System;\nclass MainClass {\nstatic public void Main(String[] args){\n`,"}\n}"],
@@ -118,7 +128,7 @@ export function questionLoopCode(code,language,question)
     }
 
     const loopWrapper = {
-        // "javascript": [`const inputN = ${n};while(inputN--){`,'}'],
+        "javascript": [`const inputN = ${n};while(inputN--){`,'}'],
         "python": [`\tfor inputN in range(${n}):\n`,"\n"],
         "java": [`int inputN = ${n};while(inputN--){`,"}"],
         "csharp": [`int inputN = ${n};while(inputN--){`,"}"],

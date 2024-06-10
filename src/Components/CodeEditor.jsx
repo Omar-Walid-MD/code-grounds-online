@@ -19,7 +19,7 @@ function CodeEditor({height,defaultLanguage="python",language,value,onChange}) {
         <Editor
         height={height}
         theme='editor-theme'
-        options={{minimap:false}}
+        options={{minimap:{enabled:false}}}
         
         
         defaultLanguage={defaultLanguage}
