@@ -19,7 +19,7 @@ import QuestionTab from '../Components/QuestionTab';
 
 const fullTime = 5 * 60;
 
-function Classic({}) {
+function Fastest({}) {
 
     const [quizState,setQuizState] = useState("running");
     const [questionIndex,setQuestionIndex] = useState(0);
@@ -69,7 +69,13 @@ function Classic({}) {
             }
             else
             {
-                setResultModal("correct");
+                socket.emit("update_room",{
+                    roomId,
+                    update: {
+                        untilNextQuestion: Date.now() + 5 * 1000,
+                        questionIndex: questionIndex + 1
+                    }
+                });
             }
 
         }
@@ -77,8 +83,6 @@ function Classic({}) {
         {
             setResultModal("incorrect");
         }
-
-        console.log("this should be first");
     }
 
     useEffect(()=>{
@@ -152,11 +156,15 @@ function Classic({}) {
                     {
                         setQuestions(room.questions);
                     }
+
+                    if(room.questionIndex)
+                    {
+                        setQuestionIndex(room.questionIndex);
+                    }
                 
                 }
             }
         });
-
 
         return ()=>{
             if(roomId && user)
@@ -166,6 +174,24 @@ function Classic({}) {
             });
         }
     },[socket,roomId]);
+
+    useEffect(()=>{
+        if(playingRoom?.untilNextQuestion)
+        {
+            console.log(playingRoom?.untilNextQuestion)
+            if(playingRoom.untilNextQuestion < Date.now())
+            {
+                socket.emit("update_room",{
+                    roomId,
+                    update: {
+                        untilNextQuestion: null
+                    }
+                });
+                setCurrentTab(0);
+            }
+        }
+
+    },[timeLeft]);
 
     useEffect(()=>{
         if(roomId && user)
@@ -182,91 +208,64 @@ function Classic({}) {
     return (
         <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
-            <Container className='d-flex flex-column justify-content-center align-items-center'>
+        <Container className='d-flex flex-column justify-content-center align-items-center'>
 
-            { 
-                quizState==="running" &&
-                <div className="d-flex w-100 flex-column gap-4">
-                    
-                    <TopBar playingRoom={playingRoom} timeLeft={timeLeft} fullTime={fullTime} setStatusModal={setStatusModal} />
-
-
-                    <div className='w-100'>
-                        <p className="fs-5 text-bright mb-1">Questions</p>
-                        <div className="questions-scroll overflow-x-scroll mb-3"
-                        onWheel={(e)=>{
-                            e.currentTarget.scrollTo({left:e.currentTarget.scrollLeft + Math.sign(e.deltaY)*100});
-                        }}
-                        >
-
-                            <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
+        { 
+            quizState==="running" &&
+            <div className="d-flex w-100 flex-column gap-4">
+                
+                <TopBar playingRoom={playingRoom} timeLeft={timeLeft} fullTime={fullTime} setStatusModal={setStatusModal} />
+                
+                {
+                    questions &&
+                    <div className="d-flex flex-column justify-content-start">
+                        <div className="d-flex gap-3 justify-content-start">
+                            <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
+                            onClick={()=>setCurrentTab(0)}>Question</Button>
+                            <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
+                            onClick={()=>setCurrentTab(1)}>Code</Button>
+                        </div>
+                        <div className='dark-bg p-3 shadow'>
                             {
-                                questions && questions.map((question,i)=>
+                                currentTab === 0 &&
+                                <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
 
-                                <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
-                                    <Button className='w-100 fs-5 rounded-0 bg-dark border-0'
-                                    style={{color:"unset"}}
-                                    onClick={()=>{
-                                        setQuestionIndex(i);
-                                        setCurrentTab(0);
-                                    }}
-                                    >
-                                    {question.title}
-                                    </Button>
-
-
-                                    {
-                                        solvedQuestions.includes(i) &&
-                                        <div className='d-flex bg-success align-items-center justify-content-center h-100 px-1' bg="success" style={{right:0,top:0}}>
-                                            <FaCheck color='white' size={15} />
-                                        </div>
-                                    }
-
-
-                                    <div className='position-absolute d-flex align-items-center justify-content-center gap-2'
-                                    style={{width:"min(200px,18vw)",bottom:"-40px"}}
-                                    >
-                                    </div>
-                                </div>
-                                )
                             }
-                            </div>
+                            <Row className={`${currentTab === 1 ? "g-4" : "g-0"}`}>
+                                <Col className='col-12'>
+                                    <CodeSubmit
+                                    visible={currentTab === 1}
+                                    onSubmit={submitAnswer}
+                                    questions={questions}
+                                    questionIndex={questionIndex}
+                                    solvedQuestions={solvedQuestions}
+
+                                    />
+                                </Col>
+                            </Row>
                         </div>
                     </div>
-                    {
-                        questions &&
-                        <div className="d-flex flex-column justify-content-start">
-                            <div className="d-flex gap-3 justify-content-start">
-                                <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                                onClick={()=>setCurrentTab(0)}>Question</Button>
-                                <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                                onClick={()=>setCurrentTab(1)}>Code</Button>
-                            </div>
-                            <div className='dark-bg p-3 shadow'>
-                                {
-                                    currentTab === 0 &&
-                                    <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
-                                    
-                                }
-                                <Row className={`${currentTab === 1 ? "g-4" : "g-0"}`}>
-                                    <Col className='col-12'>
-                                        <CodeSubmit
-                                        visible={currentTab === 1}
-                                        onSubmit={submitAnswer}
-                                        questions={questions}
-                                        questionIndex={questionIndex}
-                                        solvedQuestions={solvedQuestions}
+                }
+            </div>
+        }
+        </Container>
 
-                                        />
-                                    </Col>
-                                </Row>
-                            </div>
-                        </div>
-                    }
-                </div>
+
+        <Modal show={playingRoom?.untilNextQuestion >= Date.now()}
+        backdrop="static"
+        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+        keyboard={false}
+        centered
+        >
+            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
+                <p className='text-accent fs-5 fw-semibold'>This Question has been solved by _player_</p>
+                <p className='text-accent fs-5 fw-semibold'>Until Next Question: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
+
+            </Modal.Body>
+            {
+                playingRoom?.untilNextQuestion >= Date.now()
             }
-            </Container>
-
+        </Modal>
 
         <Modal show={resultModal!==""}
         backdrop="static"
@@ -397,4 +396,4 @@ function Classic({}) {
     );
 }
 
-export default Classic;
+export default Fastest;

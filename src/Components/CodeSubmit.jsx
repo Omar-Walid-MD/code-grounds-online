@@ -50,7 +50,6 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
         }
     },[questions]);
 
-
     return (
         <div className={`h-100 p-1 ${visible ? "d-flex" : "d-none"} flex-column gap-3`}>
             <div className="d-flex gap-3">
@@ -102,9 +101,9 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
                 <Button
                 className="main-button arrow w-100 fs-5"
                 disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
-                onClick={()=>{
+                onClick={async ()=>{
                     setResultLoading(true);
-                    onSubmit(codeValues,languageValues,questions);
+                    await onSubmit(codeValues,languageValues,questions);
                     setResultLoading(false);
                 }}
                 >Submit</Button>

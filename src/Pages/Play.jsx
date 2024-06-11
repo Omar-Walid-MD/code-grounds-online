@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { games } from '../Games/games';
 import Classic from "../GameComponents/Classic";
+import Fastest from "../GameComponents/Fastest";
+
 function Play({}) {
 
     const gameMode = useLocation().state?.gameMode;
@@ -16,7 +18,13 @@ function Play({}) {
     return (
         <>
         {
-            gameMode==="classic" && <Classic />
+            gameMode==="classic" ?
+            <Classic />
+            :
+            gameMode === "fastest" ?
+            <Fastest />
+            :
+            "" 
         }
         </>
     );

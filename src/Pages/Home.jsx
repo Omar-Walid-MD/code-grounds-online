@@ -1,40 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import { socket } from '../socketClient/socketClient';
 import EntryForm from '../Components/EntryForm';
 import { games } from '../Games/games';
 
 function Home({}) {
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const user = useSelector(store => store.auth.user);
-
-    // function userEnter(e)
-    // {
-    //     e.preventDefault();
-    //     if(username!=="")
-    //     {
-    //         const user = {
-    //             userId: uuidv4(),
-    //             username: username.trim(),
-    //             avatar: generateAvatar()
-    //         };
-
-    //         dispatch(setUser(user));
-
-    //         socket.emit("login",user);
-
-    //         navigate("/play");
-    //     }
-    // }
-
-    // useEffect(()=>{
-    //     if(user) navigate("play");
-    // },[user])
 
     return (
         <div className='page-container d-flex flex-column align-items-center justify-content-center'>
@@ -54,8 +29,6 @@ function Home({}) {
                                 <Button
                                 className='main-button arrow w-100 mt-3 fs-5'
                                 onClick={()=>{
-                                    // setGameMode(game.code);
-                                    // setWaiting(true);
                                     navigate("/wait",{state:{gameMode:game.code}})
                                 }}
                                 >Play</Button>

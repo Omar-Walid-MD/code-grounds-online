@@ -5,6 +5,7 @@ import useWebSocket from 'react-use-websocket';
 import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSlice';
 import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
+import { games } from '../Games/games';
 
 const minPlayers = 1;
 const waitingSeconds = 3;
@@ -30,7 +31,6 @@ function WaitingRoom({}) {
                 gameMode,
                 user
             });
-            console.log("sent socket")
         }
         else navigate("/");
     },[]);
@@ -52,7 +52,6 @@ function WaitingRoom({}) {
                     setTimerStarted(true);
                     if(!waitingRoom.startTime)
                     {
-                        console.log(waitingRoom.id);
                         socket.emit("set_room_start",{
                             roomId: waitingRoom.id,
                             startTime: Date.now() + waitingSeconds * 1000
@@ -100,7 +99,7 @@ function WaitingRoom({}) {
     return (
         <div className='page-container font-mono text-white d-flex flex-column justify-content-center align-items-center'>
             <Container className='d-flex flex-column align-items-center gap-3'>
-                <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{waitingRoom.gameMode}</span>}&#125; Game</h2>
+                <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{games.find((g)=>g.code===waitingRoom.gameMode)?.title}</span>}&#125; Game</h2>
                 <div className='d-flex align-items-start justify-content-between'>
                 {
                     timerStarted ? 
@@ -163,12 +162,10 @@ function WaitingTimer({waitingRoom})
         let timer = null;
         if(waitingRoom && waitingRoom.startTime)
         {
-            console.log("timer should start")
             timer = setInterval(() => {
                 if(timeLeft <= 0)
                 {
                     clearInterval(timer);
-                    console.log("time up");
                     socket.emit("start_room",{
                         roomId: waitingRoom.id
                     });
@@ -177,7 +174,6 @@ function WaitingTimer({waitingRoom})
                 else
                 {
                     const newTimeLeft = Math.max((waitingRoom.startTime-Date.now())/1000,0);
-                    console.log(waitingRoom.startTime);
                     setTimeLeft(newTimeLeft);
     
                 }

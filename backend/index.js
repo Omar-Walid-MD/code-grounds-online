@@ -106,13 +106,17 @@ io.on("connection",(socket)=>{
   socket.on("start_room",(data)=>{
 
     const room = rooms.find((r) => r.id === data.roomId);
+    const update = room.gameMode==="classic" ? {questions:getQuestions(5)}
+    : room.gameMode==="fastest" ? {questions:getQuestions(5),questionIndex:0,untilNextQuestion:null} : {}
+
     if(room && room.state !== "running")
     {
       console.log("started room");
       rooms = rooms.map((r) => r.id === data.roomId ?
-      {...r,
+      {
+        ...r,
         state: "running",
-        questions: getQuestions(5)
+        ...update
       }
        : r);
 
