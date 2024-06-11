@@ -85,6 +85,19 @@ function Fastest({}) {
         }
     }
 
+    function getQuestionSolver()
+    {
+        let questionSolver = null;
+        playingRoom?.users.forEach((u)=>{
+            if(u.state.solvedQuestions.includes(questionIndex-1))
+            {
+                questionSolver = u;
+                return;
+            }
+        });
+        return questionSolver;
+    }
+
     useEffect(()=>{
         if(location.state && user) setRoomId(location.state.roomId);
         else navigate("/");
@@ -205,6 +218,8 @@ function Fastest({}) {
         
     },[roomId, solvedQuestions]);
 
+    console.log(playingRoom?.users);
+
     return (
         <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
@@ -257,9 +272,34 @@ function Fastest({}) {
         keyboard={false}
         centered
         >
-            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
-                <p className='text-accent fs-5 fw-semibold'>This Question has been solved by _player_</p>
-                <p className='text-accent fs-5 fw-semibold'>Until Next Question: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
+            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 text-center'>
+            {
+                playingRoom?.users && questionIndex > 0 &&
+                function()
+                {
+                    const questionSolver = getQuestionSolver();
+                    if(!questionSolver) return "";
+
+                    if(questionSolver.userId === user.userId)
+                    {
+                        return (
+                        <>
+                            <IoCheckboxSharp className='scale-in text-accent' size={100} />
+                            <p className='text-accent fs-5 fw-semibold'>Great job! You gained a point!</p>
+                        </>
+                        )
+                    }
+                    else return (
+                    <>
+    
+                        <img src={questionSolver.avatar} className='user-avatar border scale-in border-4' style={{height:80}}/>
+                        <p className='text-accent fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver.username}</span></p>
+                    </> 
+                    )
+                }()
+                
+            }
+                <p className='text-accent fs-5 fw-semibold'>Next Question In: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
 
             </Modal.Body>
             {
