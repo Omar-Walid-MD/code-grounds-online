@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 function EntryForm({}) {
 
     const [username,setUsername] = useState("");
+    const [stage,setStage] = useState(0);
 
     const dispatch = useDispatch();
 
@@ -26,31 +27,43 @@ function EntryForm({}) {
     function userEnter(e)
     {
         e.preventDefault();
-        if(username!=="")
-        {
-            const user = {
-                userId: uuidv4(),
-                username: username.trim(),
-                avatar: generateAvatar()
-            };
+        setStage(1);
+        // if(username!=="")
+        // {
+        //     const user = {
+        //         userId: uuidv4(),
+        //         username: username.trim(),
+        //         avatar: generateAvatar()
+        //     };
 
-            dispatch(setUser(user));
+        //     dispatch(setUser(user));
 
-            socket.emit("login",user);
-        }
+        //     socket.emit("login",user);
+        // }
     }
 
     return (
-        <form className="entry-form-containter d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
-            <input className='main-input fs-4 w-100' type="text" placeholder='<Enter your name>'
-            value={username} onChange={handleUsername}/>
-            <Button type='submit' className='main-button arrow w-100' disabled={!username}>Join as Guest</Button>
-            <p className='m-0 comment fs-5'>or</p>
-            <div className="d-flex align-items-center gap-4 w-100">
-                <Button type='button' as={Link} to={"/login"} className='main-button arrow secondary w-100'>Log in</Button>
-                <Button type='button' as={Link} to={"register"} className='main-button arrow w-100'>Register</Button>
-            </div>
-        </form>
+        <>
+        {
+            stage===0 ?
+            <form className="entry-form-containter font-mono d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
+                <input className='main-input fs-4 w-100' type="text" placeholder='<Enter your name>'
+                value={username} onChange={handleUsername}/>
+                <Button type='submit' className='main-button arrow w-100' disabled={!username}>Join</Button>
+                <p className='m-0 mt-3 comment fs-5'>or if you've been here before</p>
+                <div className="d-flex align-items-center gap-4 w-100">
+                    <Button type='button' as={Link} to={"/login"} className='main-button arrow secondary w-100'>Log in</Button>
+                    {/* <Button type='button' as={Link} to={"register"} className='main-button arrow w-100'>Register</Button> */}
+                </div>
+            </form>
+            : stage===1 &&
+            <form className="entry-form-containter font-mono d-flex flex-column align-items-center gap-3 text-white">
+                <Button type='button' className='main-button arrow w-100'>Continue as Guest</Button>
+                <p className='m-0 mt-3 comment fs-5'>or if you want to save your progress</p>
+                <Button type='button' as={Link} to={"register"} state={{username}} className='main-button secondary arrow w-100'>Register</Button>
+            </form>
+        }
+        </>
     );
 }
 

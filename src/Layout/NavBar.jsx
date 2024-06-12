@@ -1,7 +1,8 @@
 import React from 'react';
-import { Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
+import { Button, Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { auth } from '../Firebase/firebase';
 
 function NavBar({}) {
 
@@ -20,9 +21,16 @@ function NavBar({}) {
           <Nav className="">
           {
               user &&
-              <div className='main-bg d-flex gap-3 align-items-center pe-3 border-bottom border-white border-3'>
-                  <img src={user.avatar} className='user-avatar' style={{height:30}}/>
-                  <p className='m-0 fs-5'>{user.username}</p>
+              <div className='d-flex gap-3'>
+                <div className='main-bg d-flex gap-3 align-items-center pe-3 border-bottom border-white border-3'>
+                    <img src={user.avatar} className='user-avatar' style={{height:42}}/>
+                    <p className='m-0 fs-5'>{user.username}</p>
+                </div>
+                <Button className='main-button danger arrow'
+                onClick={()=>{
+                  auth.signOut()
+                }}
+                >Logout</Button>
               </div>
           }
           </Nav>

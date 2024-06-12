@@ -1,11 +1,9 @@
 import { child, get, getDatabase, onValue, ref, set } from "firebase/database";
 import { database } from "../firebase";
 
-export function registerUser(userId, username)
+export function registerUser(userId, userInfo)
 {
-  set(ref(database, 'users/' + userId), {
-    username
-  });
+  set(ref(database, 'users/' + userId), userInfo);
 }
 
 

@@ -13,7 +13,8 @@ function Home({}) {
     const user = useSelector(store => store.auth.user);
     const loading = useSelector(store => store.auth.loading);
 
-
+    console.log(user);
+    
     return (
         <div className='page-container d-flex flex-column align-items-center justify-content-center'>
         {
