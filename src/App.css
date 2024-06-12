@@ -16,7 +16,7 @@
   --main-button: rgb(25, 107, 25);
   --main-button-hover: rgb(20, 90, 20);
 
-  --secondary: rgb(54, 150, 201);
+  --secondary: rgb(57, 139, 183);
   --secondary-hover: rgb(36, 95, 126);
 
   --danger: rgb(165, 10, 10);
@@ -68,6 +68,12 @@
 {
   width: min(500px,calc(100vw - 40px));
 }
+
+.auth-form-container
+{
+  width: min(650px,calc(100vw - 40px));
+}
+
 .time-bar-bg
 {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);

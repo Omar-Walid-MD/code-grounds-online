@@ -5,6 +5,8 @@ import Play from "../Pages/Play";
 import Home from "../Pages/Home";
 import Main from "../Layout/Main";
 import WaitingRoom from "../Pages/WaitingRoom";
+import Login from "../Pages/Login";
+import Register from "../Pages/Register";
 
 const router = createBrowserRouter([
     {
@@ -31,6 +33,16 @@ const router = createBrowserRouter([
                         children: []
                     }
                 ]
+            },
+            {
+                path: "login",
+                element: <Login />,
+                children: []
+            },
+            {
+                path: "register",
+                element: <Register />,
+                children: []
             },
             
             {

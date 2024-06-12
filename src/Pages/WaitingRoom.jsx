@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import useWebSocket from 'react-use-websocket';
-import { setWebsocket, setLastJsonMessage } from '../Store/Websocket/websocketSlice';
 import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 import { games } from '../Games/games';

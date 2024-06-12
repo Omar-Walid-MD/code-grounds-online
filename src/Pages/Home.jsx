@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import EntryForm from '../Components/EntryForm';
 import { games } from '../Games/games';
+import { auth } from '../Firebase/firebase';
 
 function Home({}) {
 
     const navigate = useNavigate();
 
     const user = useSelector(store => store.auth.user);
+    const loading = useSelector(store => store.auth.loading);
+
 
     return (
         <div className='page-container d-flex flex-column align-items-center justify-content-center'>
         {
+            loading ?
+            <Spinner className='text-white' />
+            :
             user ?
             <Container className='font-mono text-white d-flex flex-column align-items-center justify-content-center gap-2'>
                 <h1>Choose Game</h1>

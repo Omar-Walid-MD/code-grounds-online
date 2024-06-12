@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { auth } from '../../Firebase/firebase';
 
 const initialState = {
     user: null,
-    loading: false,
+    loading: true,
 }
 
 
