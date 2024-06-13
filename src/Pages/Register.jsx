@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from 'react-router';
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
 import { setUser } from '../Store/Auth/authSlice';
+import { Link } from 'react-router-dom';
+import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 
 function Register({}) {
 
@@ -40,17 +42,23 @@ function Register({}) {
         if(userCred?.user)
         {
             const userAlreadyExists = await getUser(userCred.user.uid);
+            console.log(userAlreadyExists);
+            
             if(!userAlreadyExists)
             {
 
+                const avatarString = generateAvatarString();
+
                 registerUser(userCred.user.uid,{
                     username: username,
+                    avatar: avatarString
                 });
     
                 const user = {
                     userId: userCred.user.uid,
                     email: userCred.user.email,
-                    username: username
+                    username: username,
+                    avatar: generateAvatar(avatarString)
                 }
                 dispatch(setUser(user));
             }
@@ -78,8 +86,11 @@ function Register({}) {
             <Spinner className='text-white' />
             :
             <>
-                <div className="p comment fs-5 mb-3">Registering as "<span className='text-white'>{username}</span>"</div>
-                <form className='auth-form-container d-flex flex-column align-items-center p-3 dark-bg shadow gap-3'
+                {
+                    username &&   
+                    <div className="p comment fs-5 mb-3">Registering as "<span className='text-white'>{username}</span>"</div>
+                }
+                <form className='auth-form-container d-flex flex-column align-items-center shadow gap-3'
                 onSubmit={(e)=>{
                     e.preventDefault();
                     handleSignUp("email");
@@ -96,13 +107,14 @@ function Register({}) {
                     <Button type='submit' className='main-button arrow w-100'>Register</Button>
                 </form>
                 <p className='m-0 comment fs-5'>or</p>
-                <div className='auth-form-container d-flex flex-column align-items-center p-3 dark-bg shadow gap-3'>
+                <div className='auth-form-container d-flex flex-column align-items-center shadow gap-3'>
                     <Button className='main-button secondary arrow w-100'
                     onClick={()=>handleSignUp("google")}
                     > Sign up with Google <FaGoogle /></Button>
                 </div>
             </>
         }
+        <Button as={Link} to={"/"} className='main-button danger mt-5'>Back</Button>
         </div>
     );
 }

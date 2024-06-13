@@ -64,7 +64,7 @@
   font-family: monospace !important;
 }
 
-.entry-form-containter 
+.entry-form-container 
 {
   width: min(500px,calc(100vw - 40px));
 }
@@ -180,8 +180,8 @@ input
 
 .main-input
 {
-  background-color: black;
-  color: var(--text-bright);
+  background-color: black !important;
+  color: var(--text-bright) !important;
   padding: 0.5rem;
   font-family: monospace;
   text-align: center;
@@ -190,7 +190,10 @@ input
 {
   color: var(--text-accent);
 }
-
+.main-input:-webkit-autofill{
+  -webkit-text-fill-color: var(--text-bright) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
 .main-button
 {
   --w: 2px;

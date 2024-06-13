@@ -31,19 +31,20 @@ const router = createBrowserRouter([
                         path: "play",
                         element: <Play />,
                         children: []
+                    },
+                    {
+                        path: "login",
+                        element: <Login />,
+                        children: []
+                    },
+                    {
+                        path: "register",
+                        element: <Register />,
+                        children: []
                     }
                 ]
             },
-            {
-                path: "login",
-                element: <Login />,
-                children: []
-            },
-            {
-                path: "register",
-                element: <Register />,
-                children: []
-            },
+            
             
             {
                 path: "editor",

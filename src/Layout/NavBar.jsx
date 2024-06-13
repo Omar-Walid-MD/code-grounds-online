@@ -1,13 +1,16 @@
 import React from 'react';
 import { Button, Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { auth } from '../Firebase/firebase';
+import { setUser } from '../Store/Auth/authSlice';
 
 function NavBar({}) {
 
     const user = useSelector(store => store.auth.user);
+    const dispatch = useDispatch();
 
+    console.log(user);
 
     return (
     <Navbar
@@ -20,7 +23,7 @@ function NavBar({}) {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Nav className="">
           {
-              user &&
+              user?.username &&
               <div className='d-flex gap-3'>
                 <div className='main-bg d-flex gap-3 align-items-center pe-3 border-bottom border-white border-3'>
                     <img src={user.avatar} className='user-avatar' style={{height:42}}/>
@@ -28,6 +31,7 @@ function NavBar({}) {
                 </div>
                 <Button className='main-button danger arrow'
                 onClick={()=>{
+                  dispatch(setUser(null));
                   auth.signOut()
                 }}
                 >Logout</Button>

@@ -41,7 +41,7 @@ function TopBar({playingRoom,timeLeft,fullTime,setStatusModal}) {
                         <BiStats size={20} className='me-2'/>
                         Stats
                     </Button>
-                    <Button className='main-button arrow danger' onClick={()=>navigate("/play")}>
+                    <Button className='main-button arrow danger' onClick={()=>navigate("/")}>
                         Leave Game
                     </Button>
                 </div>

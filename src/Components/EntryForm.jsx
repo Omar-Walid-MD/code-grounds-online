@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { setUser } from '../Store/Auth/authSlice';
 import { socket } from '../socketClient/socketClient';
-import { generateAvatar } from '../Helpers/avatar';
+import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom';
 
@@ -28,18 +28,15 @@ function EntryForm({}) {
     {
         e.preventDefault();
         setStage(1);
-        // if(username!=="")
-        // {
-        //     const user = {
-        //         userId: uuidv4(),
-        //         username: username.trim(),
-        //         avatar: generateAvatar()
-        //     };
+    }
 
-        //     dispatch(setUser(user));
-
-        //     socket.emit("login",user);
-        // }
+    function continueAsGuest()
+    {
+        dispatch(setUser({
+            userId: uuidv4(),
+            username,
+            avatar: generateAvatar(generateAvatarString())
+        }))
     }
 
     return (
@@ -58,10 +55,17 @@ function EntryForm({}) {
             </form>
             : stage===1 &&
             <form className="entry-form-containter font-mono d-flex flex-column align-items-center gap-3 text-white">
-                <Button type='button' className='main-button arrow w-100'>Continue as Guest</Button>
+                <Button type='button' className='main-button arrow w-100'
+                onClick={()=>continueAsGuest()}>Continue as Guest</Button>
                 <p className='m-0 mt-3 comment fs-5'>or if you want to save your progress</p>
                 <Button type='button' as={Link} to={"register"} state={{username}} className='main-button secondary arrow w-100'>Register</Button>
             </form>
+        }
+        {
+            stage===1 &&
+            
+            <Button className='main-button danger mt-5'
+            onClick={()=>setStage(0)}>Back</Button>
         }
         </>
     );

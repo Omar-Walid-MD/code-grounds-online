@@ -7,6 +7,7 @@ import { getUser } from '../Firebase/DataHandlers/users';
 import { setUser } from '../Store/Auth/authSlice';
 import { Button, Spinner } from 'react-bootstrap';
 import { FaGoogle } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 function Login({}) {
    
@@ -52,6 +53,11 @@ function Login({}) {
                 dispatch(setUser(user));
                 navigate("/");
             }
+            else
+            {
+                console.log("missing username");
+                navigate("/");
+            }
 
         }
     }
@@ -66,7 +72,7 @@ function Login({}) {
             <Spinner className='text-white' />
             :
             <>
-                <form className='auth-form-container d-flex flex-column align-items-center p-3 dark-bg shadow gap-3'
+                <form className='entry-form-container d-flex flex-column align-items-center shadow gap-3'
                 onSubmit={(e)=>{
                     e.preventDefault();
                     handleSignIn("email");
@@ -82,12 +88,12 @@ function Login({}) {
                     <Button type='submit' className='main-button arrow w-100'>Log in</Button>
                 </form>
                 <p className='m-0 comment fs-5'>or</p>
-                <div className='auth-form-container d-flex flex-column align-items-center p-3 dark-bg shadow gap-3'>
+                <div className='entry-form-container d-flex flex-column align-items-center shadow gap-3'>
                     <Button className='main-button secondary arrow w-100'
                     onClick={()=>handleSignIn("google")}
                     > Sign up with Google <FaGoogle /></Button>
-                    
                 </div>
+                <Button as={Link} to={"/"} className='main-button danger mt-5'>Back</Button>
             </>
         }
         </div>
