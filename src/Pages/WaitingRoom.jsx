@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 import { games } from '../Games/games';
 
-const minPlayers = 2;
+const minPlayers = 1;
 const waitingSeconds = 3;
 
 function WaitingRoom({}) {
@@ -119,15 +119,15 @@ function WaitingRoom({}) {
                         waitingRoom &&
                         waitingRoom.users.map((waitingUser,index)=>
 
-                        <Col key={waitingUser.userId}>
+                        <Col key={waitingUser?.userId}>
                             <div className="d-flex gap-2 align-items-end">
-                                <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
+                                <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser?.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
                                     <img
-                                    className={`user-avatar border-4 border-white ${waitingUser.userId !== user.userId ? "border" : ""}`}
-                                    src={waitingUser.avatar}
+                                    className={`user-avatar border-4 border-white ${waitingUser?.userId !== user.userId ? "border" : ""}`}
+                                    src={waitingUser?.avatar}
                                     style={{height:70}}
                                     />
-                                    <h3 className='m-0'>{waitingUser.username}</h3>
+                                    <h3 className='m-0'>{waitingUser?.username}</h3>
                                 </div>
                                 {index !== waitingRoom.users.length-1 &&  <p className='m-0 fs-5'>,</p>}
                             </div>

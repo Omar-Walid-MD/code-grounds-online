@@ -172,6 +172,34 @@ function Classic({}) {
         
     },[roomId, solvedQuestions]);
 
+
+    useEffect(()=>{
+
+        const keyBind = (e)=>{
+            if(e.altKey)
+            {
+                if(e.key==='q')
+                {
+                    setCurrentTab(0);
+                }
+                else if(e.key==='w')
+                {
+                    setCurrentTab(1);
+                }
+                else if(parseInt(e.key) > 0 && parseInt(e.key) <= questions.length)
+                {
+                    setQuestionIndex(parseInt(e.key)-1);
+                    setCurrentTab(0);
+                }
+            }
+        };
+        document.body.addEventListener("keydown",keyBind);
+
+        return ()=>{
+            document.body.removeEventListener("keydown",keyBind);
+        }
+    },[questions]);
+
     return (
         <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
