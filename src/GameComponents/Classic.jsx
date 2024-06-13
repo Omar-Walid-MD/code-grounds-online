@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput, testCode } from '../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../Helpers/rankings';
@@ -28,7 +28,7 @@ function Classic({}) {
 
     const [currentTab,setCurrentTab] = useState(0);
     
-    const [timeLeft,setTimeLeft] = useState(fullTime);
+    const [timeUp,setTimeUp] = useState(fullTime);
 
     const [resultModal, setResultModal] = useState("");
 
@@ -81,49 +81,29 @@ function Classic({}) {
         console.log("this should be first");
     }
 
+    function onTimerEnd()
+    {
+        setTimeUp(true);
+        if(resultModal !== "end")
+        {
+            socket.emit("update_room",{
+                roomId,
+                update: {
+                    results: playingRoom.users
+                }
+            });
+            
+            setStatusModal(false);
+            setResultModal("end");
+        }
+    }
+
     useEffect(()=>{
         if(location.state && user) setRoomId(location.state.roomId);
         else navigate("/");
     },[]);
 
-    useEffect(()=>{
-
-        let timer = null;
-        if(quizState==="running" && playingRoom)
-        {
-            
-            timer = setInterval(() => {
-                if(timeLeft <= 0)
-                {
-                    if(resultModal !== "end")
-                    {
-                        socket.emit("update_room",{
-                            roomId,
-                            update: {
-                                results: playingRoom.users
-                            }
-                        });
-                        clearInterval(timer);
-                        setResultModal("end");
-                    }
-                }
-                else
-                {
-                    const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
-                    setTimeLeft(newTimeLeft);
-
-                    if(!newTimeLeft)
-                    {
-                        setStatusModal(false);
-                    }
-
-                }
-            }, 1000);
-            
-        }
-
-        return ()=> {clearInterval(timer);};
-    },[quizState,timeLeft,playingRoom]);
+    
 
     useEffect(()=>{
         socket.on("get_room",(room)=>{
@@ -209,7 +189,12 @@ function Classic({}) {
                 quizState==="running" &&
                 <div className="d-flex w-100 flex-column gap-4">
                     
-                    <TopBar playingRoom={playingRoom} timeLeft={timeLeft} fullTime={fullTime} setStatusModal={setStatusModal} />
+                    <TopBar
+                    playingRoom={playingRoom}
+                    fullTime={fullTime}
+                    setStatusModal={setStatusModal}
+                    onTimerEnd={onTimerEnd}
+                    />
 
 
                     <div className='w-100'>
@@ -309,7 +294,7 @@ function Classic({}) {
                 </>
                 : resultModal === "end" && playingRoom.results &&
                 <>
-                    {timeLeft <= 0 && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                    {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
                     <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
                 {
                     getSortedRankings(playingRoom.results).map((playingUser,i)=>

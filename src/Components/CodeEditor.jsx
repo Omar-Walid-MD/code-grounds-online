@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Editor, loader } from '@monaco-editor/react';
+import { codeSnippets } from '../codeAPI/langauges';
 
-function CodeEditor({height,defaultLanguage="python",language,value,onChange}) {
+function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python",language}) {
+
 
     loader.init().then((monaco) => {
         monaco.editor.defineTheme('editor-theme', {
@@ -31,8 +33,11 @@ function CodeEditor({height,defaultLanguage="python",language,value,onChange}) {
         
         defaultLanguage={defaultLanguage}
         language={language.code}
-        value={value}
-        onChange={onChange}
+        onChange={handleEditorChange}
+        onMount={(e)=>{
+            editorRef.current = e;
+            handleEditorChange(codeSnippets[language.code]);
+        }}
         >
         </Editor>
     );

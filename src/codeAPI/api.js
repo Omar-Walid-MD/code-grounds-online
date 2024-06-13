@@ -36,5 +36,5 @@ export async function testCode(code,language,question)
     console.log(codeOuput);
     console.log(output);
 
-    return output.trim()===codeOuput.trim() || true;
+    return output.trim()===codeOuput.trim();
 }

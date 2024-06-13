@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { games } from '../Games/games';
 import { BiStats } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import { MdHourglassBottom } from 'react-icons/md';
 
-function TopBar({playingRoom,timeLeft,fullTime,setStatusModal}) {
+function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd}) {
 
     const navigate = useNavigate();
+    const [timeLeft,setTimeLeft] = useState(fullTime);
+
+    useEffect(()=>{
+
+        let timer = null;
+        if(playingRoom)
+        {
+            
+            timer = setInterval(() => {
+                if(timeLeft <= 0)
+                {
+                  onTimerEnd();
+                  clearInterval(timer); 
+                }
+                else
+                {
+                    const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
+                    setTimeLeft(newTimeLeft);
+
+                }
+            }, 1000);
+            
+        }
+
+        return ()=> {clearInterval(timer);};
+    },[timeLeft,playingRoom]);
 
     return (
         <Row className='w-100 g-0 dark-bg shadow'>

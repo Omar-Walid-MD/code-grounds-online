@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CodeEditor from '../Components/CodeEditor';
 import LanguageSelect from '../Components/LanguageSelect';
 import { codeSnippets, languages } from '../codeAPI/langauges';
@@ -7,6 +7,8 @@ import { getCodeOutput } from '../codeAPI/api';
 
 function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
 
+    const editorRef = useRef();
+
     const [languageValues,setLanguageValues] = useState([]);
     const [codeValues,setCodeValues] = useState([]);
     const [inputValues,setInputValues] = useState([]);
@@ -14,6 +16,24 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
 
     const [testLoading,setTestLoading] = useState(false);
     const [resultLoading,setResultLoading] = useState(false);
+
+    console.log(codeValues);
+
+    const handleEditorChange = (newValue) => {
+
+        const editor = editorRef.current;
+        if(editor)
+        {
+            handleCodeValue(newValue);
+            const currentValue = editor.getValue();
+        
+            if (currentValue !== newValue) {
+              const range = editor.getModel().getFullModelRange();
+              const edits = [{ range, text: newValue }];
+              editor.executeEdits('', edits);
+            }
+        }
+    };
 
     function handleCodeValue(code)
     {
@@ -44,11 +64,22 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
         if(!languageValues.length)
         {
             setLanguageValues(questions.map((q)=>languages[1]));
-            setCodeValues(questions.map((q)=>codeSnippets["python"]));
             setInputValues(questions.map((x,i)=>"1\n"));
             setOutputValues(questions.map((x,i)=>""));
+            setCodeValues(questions.map((q)=>codeSnippets["python"]));
         }
     },[questions]);
+
+    useEffect(()=>{
+        if(languageValues.length)
+        {
+            handleEditorChange(codeSnippets[languageValues[questionIndex].code]);
+        }
+    },[languageValues]);
+
+    useEffect(()=>{
+        handleEditorChange(codeValues[questionIndex]);
+    },[questionIndex]);
 
     return (
         <div className={`h-100 p-1 ${visible ? "d-flex" : "d-none"} flex-column gap-3`}>
@@ -69,11 +100,11 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
                         {
                             languageValues.length > 0  &&
                             <CodeEditor
+                            handleEditorChange={handleEditorChange}
+                            editorRef={editorRef}
                             height="300px"
                             defaultLanguage='python'
                             language={languageValues[questionIndex]}
-                            value={codeValues[questionIndex]}
-                            onChange={handleCodeValue}
                             />
                         }
                     </div>

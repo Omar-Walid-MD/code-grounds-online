@@ -36,7 +36,6 @@ export function generateAvatar(avatarString)
     {
         const n = avatarStringArray[i];
         const x = n%4; const y = parseInt(n/4);
-        console.log(n,y);
         ctx.fillRect(x*pixelSize, y*pixelSize, pixelSize,pixelSize);
         ctx.fillRect((8-x-1)*pixelSize,y*pixelSize,pixelSize,pixelSize);
 
@@ -60,7 +59,7 @@ export function generateAvatar(avatarString)
 
 const componentToHex = (c) => {
     const hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
+    return hex.length === 1 ? "0" + hex : hex;
 }
   
 const rgbToHex = (r, g, b) => {
