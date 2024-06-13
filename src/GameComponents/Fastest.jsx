@@ -18,6 +18,7 @@ import TopBar from '../Components/TopBar';
 import QuestionTab from '../Components/QuestionTab';
 
 const fullTime = 5 * 60;
+const waitTime = 2;
 
 function Fastest({}) {
 
@@ -57,13 +58,14 @@ function Fastest({}) {
                 setSolvedQuestions(newSolvedQuestions);
             }
 
-            if(newSolvedQuestions.length === questions.length)
+            if(questionIndex === questions.length-1)
             {
                 setResultModal("end");
                 socket.emit("update_room",{
                     roomId,
                     update: {
-                        results: playingRoom.users
+                        results: playingRoom.users,
+                        questionIndex: questionIndex + 1
                     }
                 });
             }
@@ -72,7 +74,7 @@ function Fastest({}) {
                 socket.emit("update_room",{
                     roomId,
                     update: {
-                        untilNextQuestion: Date.now() + 5 * 1000,
+                        untilNextQuestion: Date.now() + waitTime * 1000,
                         questionIndex: questionIndex + 1
                     }
                 });
@@ -149,32 +151,18 @@ function Fastest({}) {
 
             if(room)
             {
-                if(questions)
+                if(room.questions)
                 {
-                    room.users.forEach((user)=>{
-                        if(user.state)
-                        {
-                            if(user.state.solvedQuestions.length === questions.length)
-                            {
-                                setQuizState("results");
-                                setResultModal("end");
-                                console.log("here ending");
-                            }
-                        }
-                    });
-                }
-                else
-                {
-                    if(room.questions)
-                    {
-                        setQuestions(room.questions);
-                    }
+                    setQuestions(room.questions);
+                    setQuestionIndex(room.questionIndex);
 
-                    if(room.questionIndex)
+                    console.log(room.questionIndex)
+                    if(room.questionIndex === room.questions.length)
                     {
-                        setQuestionIndex(room.questionIndex);
+                        setQuizState("results");
+                        setResultModal("end");
+                        console.log("here ending");
                     }
-                
                 }
             }
         });
@@ -191,7 +179,7 @@ function Fastest({}) {
     useEffect(()=>{
         if(playingRoom?.untilNextQuestion)
         {
-            console.log(playingRoom?.untilNextQuestion)
+            // console.log(playingRoom?.untilNextQuestion)
             if(playingRoom.untilNextQuestion < Date.now())
             {
                 socket.emit("update_room",{
@@ -218,7 +206,6 @@ function Fastest({}) {
         
     },[roomId, solvedQuestions]);
 
-    console.log(playingRoom?.users);
 
     return (
         <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>

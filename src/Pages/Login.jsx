@@ -91,7 +91,7 @@ function Login({}) {
                 <div className='entry-form-container d-flex flex-column align-items-center shadow gap-3'>
                     <Button className='main-button secondary arrow w-100'
                     onClick={()=>handleSignIn("google")}
-                    > Sign up with Google <FaGoogle /></Button>
+                    > Sign in with Google <FaGoogle /></Button>
                 </div>
                 <Button as={Link} to={"/"} className='main-button danger mt-5'>Back</Button>
             </>

@@ -105,7 +105,6 @@ function Classic({}) {
                         });
                         clearInterval(timer);
                         setResultModal("end");
-                        console.log("this here");
                     }
                 }
                 else
@@ -129,15 +128,17 @@ function Classic({}) {
     useEffect(()=>{
         socket.on("get_room",(room)=>{
             setPlayingRoom(room);
-
+            
             if(room)
             {
-                if(questions)
+                
+                if(room.questions)
                 {
+                    setQuestions(room.questions);
                     room.users.forEach((user)=>{
                         if(user.state)
                         {
-                            if(user.state.solvedQuestions.length === questions.length)
+                            if(user.state.solvedQuestions.length === room.questions.length)
                             {
                                 setQuizState("results");
                                 setResultModal("end");
@@ -145,14 +146,6 @@ function Classic({}) {
                             }
                         }
                     });
-                }
-                else
-                {
-                    if(room.questions)
-                    {
-                        setQuestions(room.questions);
-                    }
-                
                 }
             }
         });

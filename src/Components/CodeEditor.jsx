@@ -13,13 +13,20 @@ function CodeEditor({height,defaultLanguage="python",language,value,onChange}) {
                 'editor.lineHighlightBorder': '#000000'
             },
         });
+
+        monaco.editor.addKeybindingRule({
+            keybinding: monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
+            command: null
+        })
     });
 
     return (
         <Editor
         height={height}
         theme='editor-theme'
-        options={{minimap:{enabled:false}}}
+        options={{
+            minimap:{enabled:false}        
+        }}
         
         
         defaultLanguage={defaultLanguage}
