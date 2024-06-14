@@ -78,7 +78,6 @@ function Classic({}) {
             setResultModal("incorrect");
         }
 
-        console.log("this should be first");
     }
 
     function onTimerEnd()
@@ -95,6 +94,7 @@ function Classic({}) {
             
             setStatusModal(false);
             setResultModal("end");
+
         }
     }
 
@@ -122,7 +122,6 @@ function Classic({}) {
                             {
                                 setQuizState("results");
                                 setResultModal("end");
-                                console.log("here ending");
                             }
                         }
                     });

@@ -5,7 +5,7 @@ import { BiStats } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import { MdHourglassBottom } from 'react-icons/md';
 
-function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd}) {
+function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd,onTimerTick}) {
 
     const navigate = useNavigate();
     const [timeLeft,setTimeLeft] = useState(fullTime);
@@ -26,6 +26,8 @@ function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd}) {
                 {
                     const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
                     setTimeLeft(newTimeLeft);
+
+                    if(onTimerTick) onTimerTick();
 
                 }
             }, 1000);

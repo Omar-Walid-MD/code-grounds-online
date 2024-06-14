@@ -42,7 +42,6 @@ function Register({}) {
         if(userCred?.user)
         {
             const userAlreadyExists = await getUser(userCred.user.uid);
-            console.log(userAlreadyExists);
             
             if(!userAlreadyExists)
             {

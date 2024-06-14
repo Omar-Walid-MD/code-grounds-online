@@ -1,10 +1,15 @@
-import { child, get, getDatabase, onValue, ref, set } from "firebase/database";
+import { child, get, getDatabase, onValue, ref, set, update } from "firebase/database";
 import { database } from "../firebase";
 import { generateAvatar } from "../../Helpers/avatar";
 
 export function registerUser(userId, userInfo)
 {
   set(ref(database, 'users/' + userId), userInfo);
+}
+
+export function updateUserInfo(userId, userInfo)
+{
+    update(ref(database, 'users/' + userId), userInfo);
 }
 
 export async function getUser(userId)

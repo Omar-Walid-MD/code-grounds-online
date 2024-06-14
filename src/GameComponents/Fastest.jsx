@@ -29,7 +29,7 @@ function Fastest({}) {
 
     const [currentTab,setCurrentTab] = useState(0);
     
-    const [timeLeft,setTimeLeft] = useState(fullTime);
+    const [timeUp,setTimeUp] = useState(fullTime);
 
     const [resultModal, setResultModal] = useState("");
 
@@ -100,50 +100,46 @@ function Fastest({}) {
         return questionSolver;
     }
 
+    function onTimerEnd()
+    {
+        setTimeUp(true);
+        if(resultModal !== "end")
+        {
+            socket.emit("update_room",{
+                roomId,
+                update: {
+                    results: playingRoom.users
+                }
+            });
+            setResultModal("end");
+            setStatusModal(false);
+
+        }
+    }
+
+    function onTimerTick()
+    {
+        if(playingRoom?.untilNextQuestion)
+        {
+            if(playingRoom.untilNextQuestion < Date.now())
+            {
+                socket.emit("update_room",{
+                    roomId,
+                    update: {
+                        untilNextQuestion: null
+                    }
+                });
+                setCurrentTab(0);
+            }
+        }
+    }
+
     useEffect(()=>{
         if(location.state && user) setRoomId(location.state.roomId);
         else navigate("/");
     },[]);
 
-    useEffect(()=>{
-
-        let timer = null;
-        if(quizState==="running" && playingRoom)
-        {
-            
-            timer = setInterval(() => {
-                if(timeLeft <= 0)
-                {
-                    if(resultModal !== "end")
-                    {
-                        socket.emit("update_room",{
-                            roomId,
-                            update: {
-                                results: playingRoom.users
-                            }
-                        });
-                        clearInterval(timer);
-                        setResultModal("end");
-                        console.log("this here");
-                    }
-                }
-                else
-                {
-                    const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
-                    setTimeLeft(newTimeLeft);
-
-                    if(!newTimeLeft)
-                    {
-                        setStatusModal(false);
-                    }
-
-                }
-            }, 1000);
-            
-        }
-
-        return ()=> {clearInterval(timer);};
-    },[quizState,timeLeft,playingRoom]);
+  
 
     useEffect(()=>{
         socket.on("get_room",(room)=>{
@@ -156,12 +152,10 @@ function Fastest({}) {
                     setQuestions(room.questions);
                     setQuestionIndex(room.questionIndex);
 
-                    console.log(room.questionIndex)
                     if(room.questionIndex === room.questions.length)
                     {
                         setQuizState("results");
                         setResultModal("end");
-                        console.log("here ending");
                     }
                 }
             }
@@ -175,24 +169,6 @@ function Fastest({}) {
             });
         }
     },[socket,roomId]);
-
-    useEffect(()=>{
-        if(playingRoom?.untilNextQuestion)
-        {
-            // console.log(playingRoom?.untilNextQuestion)
-            if(playingRoom.untilNextQuestion < Date.now())
-            {
-                socket.emit("update_room",{
-                    roomId,
-                    update: {
-                        untilNextQuestion: null
-                    }
-                });
-                setCurrentTab(0);
-            }
-        }
-
-    },[timeLeft]);
 
     useEffect(()=>{
         if(roomId && user)
@@ -239,8 +215,14 @@ function Fastest({}) {
             quizState==="running" &&
             <div className="d-flex w-100 flex-column gap-4">
                 
-                <TopBar playingRoom={playingRoom} timeLeft={timeLeft} fullTime={fullTime} setStatusModal={setStatusModal} />
-                
+                <TopBar
+                playingRoom={playingRoom}
+                fullTime={fullTime}
+                setStatusModal={setStatusModal}
+                onTimerEnd={onTimerEnd}
+                onTimerTick={onTimerTick}
+                />                
+
                 {
                     questions &&
                     <div className="d-flex flex-column justify-content-start">
@@ -275,47 +257,14 @@ function Fastest({}) {
         }
         </Container>
 
+        <CountdownModal
+        show={playingRoom?.untilNextQuestion >= Date.now()}
+        questionSolver={getQuestionSolver()}
+        playingRoom={playingRoom}
+        user={user}
+        />
 
-        <Modal show={playingRoom?.untilNextQuestion >= Date.now()}
-        backdrop="static"
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
-        keyboard={false}
-        centered
-        >
-            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 text-center'>
-            {
-                playingRoom?.users && questionIndex > 0 &&
-                function()
-                {
-                    const questionSolver = getQuestionSolver();
-                    if(!questionSolver) return "";
-
-                    if(questionSolver.userId === user.userId)
-                    {
-                        return (
-                        <>
-                            <IoCheckboxSharp className='scale-in text-accent' size={100} />
-                            <p className='text-accent fs-5 fw-semibold'>Great job! You gained a point!</p>
-                        </>
-                        )
-                    }
-                    else return (
-                    <>
-    
-                        <img src={questionSolver.avatar} className='user-avatar border scale-in border-4' style={{height:80}}/>
-                        <p className='text-accent fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver.username}</span></p>
-                    </> 
-                    )
-                }()
-                
-            }
-                <p className='text-accent fs-5 fw-semibold'>Next Question In: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
-
-            </Modal.Body>
-            {
-                playingRoom?.untilNextQuestion >= Date.now()
-            }
-        </Modal>
+        
 
         <Modal show={resultModal!==""}
         backdrop="static"
@@ -337,7 +286,7 @@ function Fastest({}) {
                 </>
                 : resultModal === "end" && playingRoom.results &&
                 <>
-                    {timeLeft <= 0 && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                    {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
                     <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
                 {
                     getSortedRankings(playingRoom.results).map((playingUser,i)=>
@@ -445,5 +394,58 @@ function Fastest({}) {
         </div>
     );
 }
+
+
+
+function CountdownModal({show, questionSolver,playingRoom,user}) {
+
+    const [flip,setFlip] = useState(true);
+    useEffect(()=>{
+        let timer;
+        if(show)
+        {
+            timer = setInterval(() => {
+                setFlip(!flip);
+            }, 1000);
+            
+        }
+
+        return ()=> {clearInterval(timer);};
+    },[show]);
+
+    return (
+        <Modal show={show}
+        backdrop="static"
+        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+        keyboard={false}
+        centered
+        >
+            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 text-center'>
+            {
+                playingRoom?.users && playingRoom?.questionIndex > 0 && questionSolver &&
+                questionSolver?.userId === user?.userId ?
+                    
+                <>
+                    <IoCheckboxSharp className='scale-in text-accent' size={100} />
+                    <p className='text-accent fs-5 fw-semibold'>Great job! You gained a point!</p>
+                </>
+                :
+                <>
+                    <img src={questionSolver?.avatar} className='user-avatar border scale-in border-4' style={{height:80}}/>
+                    <p className='text-accent fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver?.username}</span></p>
+                </> 
+                    
+                
+            }
+                <p className='text-accent fs-5 fw-semibold'>Next Question In: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
+
+            </Modal.Body>
+            {
+                playingRoom?.untilNextQuestion >= Date.now()
+            }
+        </Modal>
+    );
+}
+
 
 export default Fastest;

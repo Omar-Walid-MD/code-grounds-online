@@ -34,7 +34,6 @@ function Login({}) {
         }
         else if(signInType==="email")
         {
-            console.log(loginInfo.email,loginInfo.password);
             userCred = await signInWithEmailAndPassword(auth,loginInfo.email,loginInfo.password);
         }
 
@@ -55,7 +54,6 @@ function Login({}) {
             }
             else
             {
-                console.log("missing username");
                 navigate("/");
             }
 
