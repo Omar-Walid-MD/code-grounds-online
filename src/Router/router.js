@@ -8,6 +8,7 @@ import WaitingRoom from "../Pages/WaitingRoom";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import Profile from "../Pages/Profile";
+import Background from "../Components/Background";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
             {
                 path: "editor",
                 element: <Editor />,
+                children: []
+            },
+            {
+                path:"test",
+                element: <Background />,
                 children: []
             }
         ]

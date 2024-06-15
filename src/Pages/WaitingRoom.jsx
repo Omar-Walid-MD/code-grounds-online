@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 import { games } from '../Games/games';
 
-const minPlayers = 1;
+const minPlayers = 2;
 const waitingSeconds = 3;
 
 function WaitingRoom({}) {

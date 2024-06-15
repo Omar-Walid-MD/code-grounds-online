@@ -17,16 +17,20 @@ function Register({}) {
 
     const username = useLocation().state?.username;
     const [loading,setLoading] = useState(false);
-    const [loginInfo,setLoginInfo] = useState({
+    const [registerInfo,setRegisterInfo] = useState({
         email:"",
         password: "",
         confirmPassword: ""
     });
 
-    function handleLoginInfo(e)
+    const [errorMessage,setErrorMessage] = useState("");
+
+    function handleRegisterInfo(e)
     {
-        setLoginInfo(l => ({...l,[e.target.name]:e.target.value}));
+        setRegisterInfo(l => ({...l,[e.target.name]:e.target.value}));
     }
+
+    console.log(registerInfo);
     
     async function handleSignUp(signUpType)
     {
@@ -37,7 +41,16 @@ function Register({}) {
         }
         else if(signUpType==="email")
         {
-            userCred = await createUserWithEmailAndPassword(auth,loginInfo.email,loginInfo.password);
+            try {
+                userCred = await createUserWithEmailAndPassword(auth,registerInfo.email,registerInfo.password);
+                
+            } catch (error) {
+                if(error.code==="auth/weak-password")
+                {
+                    setErrorMessage("Password.length < 6")
+                }
+                return
+            }
         }
         if(userCred?.user)
         {
@@ -79,7 +92,7 @@ function Register({}) {
   
 
     return (
-        <div className='page-container d-flex flex-column align-items-center justify-content-center gap-2'>
+        <div className='page-container font-mono d-flex flex-column align-items-center justify-content-center gap-2'>
         {
             loading ?
             <Spinner className='text-white' />
@@ -89,27 +102,32 @@ function Register({}) {
                     username &&   
                     <div className="p comment fs-5 mb-3">Registering as "<span className='text-white'>{username}</span>"</div>
                 }
-                <form className='auth-form-container d-flex flex-column align-items-center shadow gap-3'
+                <form className='auth-form-container d-flex flex-column align-items-center gap-3'
                 onSubmit={(e)=>{
                     e.preventDefault();
                     handleSignUp("email");
                 }}
                 >
                     <input className='main-input fs-5 w-100' type="email" placeholder='<Enter Email>'
-                    name='email' value={loginInfo.email} onChange={handleLoginInfo} />
+                    name='email' value={registerInfo.email} onChange={handleRegisterInfo} />
 
                     <div className="d-flex align-items-center w-100 gap-3">
                         <input className='main-input fs-5 w-100' type="password" placeholder='<Enter Password>' autoComplete="new-password"
-                        name='password' value={loginInfo.password} onChange={handleLoginInfo} />
-                        <input className='main-input fs-5 w-100' type="password" placeholder='<Confirm Password>' autoComplete="new-password" />
+                        name='password' value={registerInfo.password} onChange={handleRegisterInfo} />
+                        <input className='main-input fs-5 w-100' type="password" placeholder='<Confirm Password>' autoComplete="new-password"
+                        name='confirmPassword' value={registerInfo.confirmPassword} onChange={handleRegisterInfo} />
                     </div>
-                    <Button type='submit' className='main-button arrow w-100'>Register</Button>
+                    
+                    {errorMessage && <p className='m-0 px-2 danger-bg text-white shadow'>{errorMessage}</p>}
+                    <Button type='submit' className='main-button arrow w-100'
+                    disabled={!(registerInfo.email && registerInfo.password && registerInfo.confirmPassword)}
+                    >Register</Button>
                 </form>
                 <p className='m-0 comment fs-5'>or</p>
-                <div className='auth-form-container d-flex flex-column align-items-center shadow gap-3'>
+                <div className='auth-form-container d-flex flex-column align-items-center gap-3'>
                     <Button className='main-button secondary arrow w-100'
                     onClick={()=>handleSignUp("google")}
-                    > Sign up with Google <FaGoogle /></Button>
+                    >Sign up with Google <FaGoogle /></Button>
                 </div>
             </>
         }
