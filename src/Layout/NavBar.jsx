@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { auth } from '../Firebase/firebase';
 import { setUser } from '../Store/Auth/authSlice';
+import UserAvatar from '../Components/UserAvatar';
 
 function NavBar({}) {
 
@@ -25,18 +26,18 @@ function NavBar({}) {
               user?.username &&
               <Dropdown className='d-flex flex-column align-items-center'>
                 <Dropdown.Toggle className='main-bg p-0 rounded-0 d-flex gap-3 align-items-center pe-3 border-0 border-bottom border-white border-3' id="dropdown-basic">
-                      <img src={user.avatar} className='user-avatar' style={{height:42}}/>
+                      <UserAvatar src={user.avatar} style={{height:42}}/>
                       <p className='m-0 fs-5'>{user.username}</p>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className='rounded-0 text-center' style={{left:"unset"}}>
-                  <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                  <Dropdown.Item className='p-0 px-2'>
+                <Dropdown.Menu className='p-0 rounded-0 text-center' style={{left:"unset"}}>
+                  <Dropdown.Item className='p-2' as={Link} to={"/profile"}>Profile</Dropdown.Item>
+                  
+                  <Dropdown.Item className='p-0'>
                     <Button className='main-button w-100 danger arrow fs-6'
                     onClick={()=>{
                       dispatch(setUser(null));
-                      auth.signOut()
+                      auth.signOut();
                     }}
                     >Logout</Button>
                   </Dropdown.Item>

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { auth } from '../../Firebase/firebase';
-import { updateUserInfo } from '../../Firebase/DataHandlers/users';
+import { removeUserFromFirebase, updateUserInfo } from '../../Firebase/DataHandlers/users';
 import { generateAvatar } from '../../Helpers/avatar';
 
 const initialState = {
@@ -21,6 +21,14 @@ export const updateUser = createAsyncThunk(
   (update,{getState}) => {
     updateUserInfo(getState().auth.user.userId,update);
     return update;
+});
+
+export const removeUser = createAsyncThunk(
+  'auth/removeUser',
+  (user) => {
+    removeUserFromFirebase(user);
+    console.log("here");
+    return user;
 });
 
 export const slice = createSlice({
@@ -48,14 +56,22 @@ export const slice = createSlice({
         state.loading = true;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        if(action.payload.avatar)
-        {
-          action.payload.avatar = generateAvatar(action.payload.avatar);
-        }
         state.user = {...state.user,...action.payload};
         state.loading = false;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+      })
+
+      //removeUser
+      .addCase(removeUser.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(removeUser.fulfilled, (state, action) => {
+        state.user = null;
+        state.loading = false;
+      })
+      .addCase(removeUser.rejected, (state, action) => {
         state.loading = false;
       })
 

@@ -45,7 +45,7 @@ function Home({}) {
             userId: user.userId,
             email: user.email,
             username: username,
-            avatar: generateAvatar(avatarString)
+            avatar: avatarString
         }
         dispatch(setUser(updatedUser));
     }

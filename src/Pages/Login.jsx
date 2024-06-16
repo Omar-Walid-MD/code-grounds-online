@@ -53,6 +53,8 @@ function Login({}) {
         {
             const loggedInUserInfo = await getUser(userCred.user.uid);
             
+            
+            console.log(loggedInUserInfo);
             if(loggedInUserInfo)
             {
                 const user = {
@@ -71,8 +73,6 @@ function Login({}) {
         }
     }
 
-
-  
 
     return (
         <div className='page-container font-mono d-flex flex-column align-items-center justify-content-center gap-2'>

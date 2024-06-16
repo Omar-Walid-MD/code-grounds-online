@@ -2,9 +2,9 @@
 const Canvas = require("canvas");
 
 
-export function generateAvatarString()
-{
-    let avatarString = rgbToHex(50+parseInt(Math.random()*150),50+parseInt(Math.random()*150),50+parseInt(Math.random()*150));
+export function generateAvatarString(color="")
+{ 
+    let avatarString = color || rgbToHex(50+parseInt(Math.random()*150),50+parseInt(Math.random()*150),50+parseInt(Math.random()*150));
     
     for(let i = 0; i < 32; i++)
     {

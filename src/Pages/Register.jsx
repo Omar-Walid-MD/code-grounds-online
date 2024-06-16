@@ -70,7 +70,7 @@ function Register({}) {
                     userId: userCred.user.uid,
                     email: userCred.user.email,
                     username: username,
-                    avatar: generateAvatar(avatarString)
+                    avatar: avatarString
                 }
                 dispatch(setUser(user));
             }
