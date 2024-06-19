@@ -45,3 +45,10 @@ export function removeUserFromFirebase(user)
     remove(ref(database, 'users/' + user.userId))
     remove(ref(database, 'usernames/' + user.username))
 }
+
+export async function usernameExists(username)
+{
+    return await get(child(ref(database), `usernames/${username}`)).then((snapshot) => {
+            return snapshot.exists()
+    });
+}

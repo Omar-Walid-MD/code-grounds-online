@@ -32,14 +32,18 @@ function Login({}) {
         let userCred;
         if(signInType==="google")
         {
-            userCred = await signInWithPopup(auth, googleProvider);
+            try {
+                userCred = await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+
+            }
         }
         else if(signInType==="email")
         {
-            try {
-                
+            try {  
                 userCred = await signInWithEmailAndPassword(auth,loginInfo.email,loginInfo.password);
             } catch (error) {
+
                 if(error.code==="auth/invalid-credential")
                 {
                     setErrorMessage("!Email.isCorrect || !Password.isCorrect")
@@ -48,13 +52,12 @@ function Login({}) {
             }
         }
 
+        console.log(userCred?.user)
 
         if(userCred?.user)
         {
             const loggedInUserInfo = await getUser(userCred.user.uid);
             
-            
-            console.log(loggedInUserInfo);
             if(loggedInUserInfo)
             {
                 const user = {

@@ -6,9 +6,10 @@ import EntryForm from '../Components/EntryForm';
 import { games } from '../Games/games';
 import { auth } from '../Firebase/firebase';
 import { setUser } from '../Store/Auth/authSlice';
-import { registerUser } from '../Firebase/DataHandlers/users';
+import { registerUser, usernameExists } from '../Firebase/DataHandlers/users';
 import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 import { socket } from '../socketClient/socketClient';
+import Background from '../Components/Background';
 
 function Home({}) {
 
@@ -19,6 +20,7 @@ function Home({}) {
 
     const [username,setUsername] = useState("");
     const [stage,setStage] = useState(0);
+    const [errorMessage,setErrorMessage] = useState("");
 
     const dispatch = useDispatch();
 
@@ -30,24 +32,32 @@ function Home({}) {
         }
     }
 
-    function userEnter(e)
+    async function userEnter(e)
     {
         e.preventDefault();
 
-        const avatarString = generateAvatarString();
-
-        registerUser(user.userId,{
-            username: username,
-            avatar: avatarString
-        });
-
-        const updatedUser = {
-            userId: user.userId,
-            email: user.email,
-            username: username,
-            avatar: avatarString
+        if(await usernameExists(username))
+        {
+            setErrorMessage("Username is already taken")
         }
-        dispatch(setUser(updatedUser));
+        else
+        {
+            const avatarString = generateAvatarString();
+    
+            registerUser(user.userId,{
+                username: username,
+                avatar: avatarString
+            });
+    
+            const updatedUser = {
+                userId: user.userId,
+                email: user.email,
+                username: username,
+                avatar: avatarString
+            }
+            dispatch(setUser(updatedUser));
+        }
+
     }
 
     useEffect(()=>{
@@ -94,6 +104,8 @@ function Home({}) {
                 <form className="entry-form-container font-mono d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
                 <input className='main-input fs-4 w-100' type="text" placeholder='<Enter a username>'
                 value={username} onChange={handleUsername}/>
+                {errorMessage && <p className='m-0 px-2 danger-bg text-white shadow'>{errorMessage}</p>}
+
                 <Button type='submit' className='main-button arrow w-100' disabled={!username}>Submit</Button>
             </form>
             </>

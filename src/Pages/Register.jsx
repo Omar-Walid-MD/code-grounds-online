@@ -62,14 +62,14 @@ function Register({}) {
                 const avatarString = generateAvatarString();
 
                 registerUser(userCred.user.uid,{
-                    username: username,
+                    ...(username && {username}),
                     avatar: avatarString
                 });
     
                 const user = {
                     userId: userCred.user.uid,
                     email: userCred.user.email,
-                    username: username,
+                    ...(username && {username}),
                     avatar: avatarString
                 }
                 dispatch(setUser(user));
