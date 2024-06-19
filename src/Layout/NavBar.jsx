@@ -31,7 +31,10 @@ function NavBar({}) {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className='p-0 rounded-0 text-center' style={{left:"unset"}}>
+                {
+                  auth.currentUser &&
                   <Dropdown.Item className='p-2' as={Link} to={"/profile"}>Profile</Dropdown.Item>
+                }
                   
                   <Dropdown.Item className='p-0'>
                     <Button className='main-button w-100 danger arrow fs-6'

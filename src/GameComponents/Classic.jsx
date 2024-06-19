@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput, testCode } from '../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../Helpers/rankings';
+import { updateUserCompletedGames } from '../Firebase/DataHandlers/users';
 
 import { MdWarning } from "react-icons/md";
 import { MdHourglassBottom } from "react-icons/md";
@@ -16,8 +17,10 @@ import { games } from '../Games/games';
 import CodeSubmit from '../Components/CodeSubmit';
 import TopBar from '../Components/TopBar';
 import QuestionTab from '../Components/QuestionTab';
+import UserAvatar from '../Components/UserAvatar';
+import { auth } from '../Firebase/firebase';
 
-const fullTime = 5 * 60;
+const fullTime = 0.1 * 60;
 
 function Classic({}) {
 
@@ -59,13 +62,13 @@ function Classic({}) {
 
             if(newSolvedQuestions.length === questions.length)
             {
-                setResultModal("end");
                 socket.emit("update_room",{
                     roomId,
                     update: {
                         results: playingRoom.users
                     }
                 });
+                endGame();
             }
             else
             {
@@ -80,6 +83,14 @@ function Classic({}) {
 
     }
 
+    function endGame()
+    {
+        setStatusModal(false);
+        setResultModal("end");
+        setQuizState("results");
+        if(auth.currentUser) updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+    }
+
     function onTimerEnd()
     {
         setTimeUp(true);
@@ -92,8 +103,7 @@ function Classic({}) {
                 }
             });
             
-            setStatusModal(false);
-            setResultModal("end");
+            endGame();
 
         }
     }
@@ -120,8 +130,7 @@ function Classic({}) {
                         {
                             if(user.state.solvedQuestions.length === room.questions.length)
                             {
-                                setQuizState("results");
-                                setResultModal("end");
+                                endGame();
                             }
                         }
                     });
@@ -308,8 +317,8 @@ function Classic({}) {
                         <Col className='col-6'>
                             <div className='w-100 d-flex align-items-center justify-content-start gap-3 shadow'>
                                 <div className="d-flex align-items-center gap-2">
-                                    <img
-                                    className='user-avatar border-3 border'
+                                    <UserAvatar
+                                    className='border-3 border'
                                     src={playingUser.avatar}
                                     style={{height:40}}
                                     />
@@ -376,8 +385,8 @@ function Classic({}) {
                                 <div className="d-flex align-items-center gap-3">
                                     {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute" style={{left:20}}></div>}
                                     {i+1}
-                                    <img
-                                    className='user-avatar border-3 border'
+                                    <UserAvatar
+                                    className='border-3 border'
                                     src={playingUser.avatar}
                                     style={{height:40}}
                                     />

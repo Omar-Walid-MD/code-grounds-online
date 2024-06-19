@@ -16,8 +16,11 @@ import { games } from '../Games/games';
 import CodeSubmit from '../Components/CodeSubmit';
 import TopBar from '../Components/TopBar';
 import QuestionTab from '../Components/QuestionTab';
+import UserAvatar from '../Components/UserAvatar';
+import { updateUserCompletedGames } from '../Firebase/DataHandlers/users';
+import { auth } from '../Firebase/firebase';
 
-const fullTime = 5 * 60;
+const fullTime = 0.1 * 60;
 const waitTime = 2;
 
 function Fastest({}) {
@@ -60,7 +63,6 @@ function Fastest({}) {
 
             if(questionIndex === questions.length-1)
             {
-                setResultModal("end");
                 socket.emit("update_room",{
                     roomId,
                     update: {
@@ -68,6 +70,7 @@ function Fastest({}) {
                         questionIndex: questionIndex + 1
                     }
                 });
+                endGame();
             }
             else
             {
@@ -100,6 +103,14 @@ function Fastest({}) {
         return questionSolver;
     }
 
+    function endGame()
+    {
+        setStatusModal(false);
+        setResultModal("end");
+        setQuizState("results");
+        if(auth.currentUser) updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+    }
+
     function onTimerEnd()
     {
         setTimeUp(true);
@@ -111,8 +122,7 @@ function Fastest({}) {
                     results: playingRoom.users
                 }
             });
-            setResultModal("end");
-            setStatusModal(false);
+            endGame();
 
         }
     }
@@ -154,8 +164,7 @@ function Fastest({}) {
 
                     if(room.questionIndex === room.questions.length)
                     {
-                        setQuizState("results");
-                        setResultModal("end");
+                        endGame();
                     }
                 }
             }
@@ -301,8 +310,8 @@ function Fastest({}) {
                         <Col className='col-6'>
                             <div className='w-100 d-flex align-items-center justify-content-start gap-3 shadow'>
                                 <div className="d-flex align-items-center gap-2">
-                                    <img
-                                    className='user-avatar border-3 border'
+                                    <UserAvatar
+                                    className='border-3 border'
                                     src={playingUser.avatar}
                                     style={{height:40}}
                                     />
@@ -369,8 +378,8 @@ function Fastest({}) {
                                 <div className="d-flex align-items-center gap-3">
                                     {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute" style={{left:20}}></div>}
                                     {i+1}
-                                    <img
-                                    className='user-avatar border-3 border'
+                                    <UserAvatar
+                                    className='border-3 border'
                                     src={playingUser.avatar}
                                     style={{height:40}}
                                     />
@@ -431,7 +440,7 @@ function CountdownModal({show, questionSolver,playingRoom,user}) {
                 </>
                 :
                 <>
-                    <img src={questionSolver?.avatar} className='user-avatar border scale-in border-4' style={{height:80}}/>
+                    <UserAvatar src={questionSolver?.avatar} className='border scale-in border-4' style={{height:80}}/>
                     <p className='text-accent fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver?.username}</span></p>
                 </> 
                     

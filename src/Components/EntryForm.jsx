@@ -44,7 +44,7 @@ function EntryForm({}) {
         dispatch(setUser({
             userId: uuidv4(),
             username,
-            avatar: generateAvatar(generateAvatarString())
+            avatar: generateAvatarString()
         }))
     }
 

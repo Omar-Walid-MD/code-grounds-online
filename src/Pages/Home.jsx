@@ -9,7 +9,6 @@ import { setUser } from '../Store/Auth/authSlice';
 import { registerUser, usernameExists } from '../Firebase/DataHandlers/users';
 import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 import { socket } from '../socketClient/socketClient';
-import Background from '../Components/Background';
 
 function Home({}) {
 

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 import { games } from '../Games/games';
+import UserAvatar from '../Components/UserAvatar';
 
 const minPlayers = 2;
 const waitingSeconds = 3;
@@ -122,8 +123,8 @@ function WaitingRoom({}) {
                         <Col key={waitingUser?.userId}>
                             <div className="d-flex gap-2 align-items-end">
                                 <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser?.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
-                                    <img
-                                    className={`user-avatar border-4 border-white ${waitingUser?.userId !== user.userId ? "border" : ""}`}
+                                    <UserAvatar
+                                    className={`border-4 border-white ${waitingUser?.userId !== user.userId ? "border" : ""}`}
                                     src={waitingUser?.avatar}
                                     style={{height:70}}
                                     />

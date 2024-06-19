@@ -32,9 +32,6 @@ export async function getUser(userId)
         }
     });
 
-
-    // const avatar = userInfo?.avatar;
-    // if(avatar) userInfo = {...userInfo,avatar};
     return userInfo;
     
 }
@@ -51,4 +48,36 @@ export async function usernameExists(username)
     return await get(child(ref(database), `usernames/${username}`)).then((snapshot) => {
             return snapshot.exists()
     });
+}
+
+export async function updateUserCompletedGames(userId,gameMode,won=false)
+{
+    let userCompletedGames = await get(child(ref(database), `users/${userId}/stats/completed`)).then((snapshot) => {
+        return snapshot.exists() ? snapshot.val() : {};
+    });
+    if(userCompletedGames[gameMode])
+    {
+        userCompletedGames[gameMode]++;
+    }
+    else
+    {
+        userCompletedGames[gameMode] = 1;
+    }
+    update(ref(database,`users/${userId}/stats/completed`),userCompletedGames);
+
+    if(won)
+    {
+        let userWonGames = await get(child(ref(database), `users/${userId}/stats/won`)).then((snapshot) => {
+            return snapshot.exists() ? snapshot.val() : {};
+        });
+        if(userWonGames[gameMode])
+        {
+            userWonGames[gameMode]++;
+        }
+        else
+        {
+            userWonGames[gameMode] = 1;
+        }
+        update(ref(database,`users/${userId}/stats/won`),userWonGames);
+    }
 }

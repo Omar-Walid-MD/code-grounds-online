@@ -67,7 +67,7 @@ function Profile({}) {
     }
 
     useEffect(()=>{
-        if(!user && !loading)
+        if((!user && !loading) || !auth.currentUser)
         {
             navigate("/");
         }
