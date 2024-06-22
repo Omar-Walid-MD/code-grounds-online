@@ -37,11 +37,6 @@ export async function getUser(userId)
 }
 
 
-export function removeUserFromFirebase(user)
-{    
-    remove(ref(database, 'users/' + user.userId))
-    remove(ref(database, 'usernames/' + user.username))
-}
 
 export async function usernameExists(username)
 {
@@ -52,32 +47,30 @@ export async function usernameExists(username)
 
 export async function updateUserCompletedGames(userId,gameMode,won=false)
 {
-    let userCompletedGames = await get(child(ref(database), `users/${userId}/stats/completed`)).then((snapshot) => {
+    let userStats = await get(child(ref(database), `users/${userId}/stats/`)).then((snapshot) => {
         return snapshot.exists() ? snapshot.val() : {};
     });
-    if(userCompletedGames[gameMode])
+    
+    if(userStats.completed[gameMode])
     {
-        userCompletedGames[gameMode]++;
+        userStats.completed[gameMode]++;
     }
     else
     {
-        userCompletedGames[gameMode] = 1;
+        userStats.completed[gameMode] = 1;
     }
-    update(ref(database,`users/${userId}/stats/completed`),userCompletedGames);
-
+    
     if(won)
     {
-        let userWonGames = await get(child(ref(database), `users/${userId}/stats/won`)).then((snapshot) => {
-            return snapshot.exists() ? snapshot.val() : {};
-        });
-        if(userWonGames[gameMode])
+        if(userStats.won[gameMode])
         {
-            userWonGames[gameMode]++;
+            userStats.won[gameMode]++;
         }
         else
         {
-            userWonGames[gameMode] = 1;
+            userStats.won[gameMode] = 1;
         }
-        update(ref(database,`users/${userId}/stats/won`),userWonGames);
     }
+    update(ref(database,`users/${userId}/stats/`),userStats);
+    return userStats;
 }

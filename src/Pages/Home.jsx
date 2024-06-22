@@ -21,6 +21,8 @@ function Home({}) {
     const [stage,setStage] = useState(0);
     const [errorMessage,setErrorMessage] = useState("");
 
+    const [runningRoom,setRunningRoom] = useState();
+
     const dispatch = useDispatch();
 
     function handleUsername(e)
@@ -62,9 +64,16 @@ function Home({}) {
     useEffect(()=>{
         if(user?.username)
         {
+            console.log("logged in")
             socket.emit("login",user);
         }
-    },[]);
+    },[user]);
+
+    useEffect(()=>{
+        socket.on("get_running_room",(room)=>{
+            setRunningRoom(room);
+        })
+    },[socket])
 
     
     return (
@@ -76,27 +85,34 @@ function Home({}) {
             user ?
             user.username ?
             <Container className='font-mono text-white d-flex flex-column align-items-center justify-content-center gap-2'>
-                <h1>Choose Game</h1>
+            {
+                runningRoom ?
+                <RejoinRoom user={user} runningRoom={runningRoom} setRunningRoom={setRunningRoom}/>
+                :
+                <>
+                    <h1>Choose Game</h1>
 
-                <Row className='mt-3'>
-                {
-                    games.map((game)=>
-                    
-                        <Col key={`game-col-${game.code}`}>
-                            <div className='d-flex flex-column align-items-center dark-bg shadow p-3'>
-                                <h3>{game.title}</h3>
-                                <p className='comment'>{game.desc}</p>
-                                <Button
-                                className='main-button arrow w-100 mt-3 fs-5'
-                                onClick={()=>{
-                                    navigate("/wait",{state:{gameMode:game.code}})
-                                }}
-                                >Play</Button>
-                            </div>
-                        </Col>
-                    )
-                }
-                </Row>
+                    <Row className='mt-3'>
+                    {
+                        games.map((game)=>
+                        
+                            <Col key={`game-col-${game.code}`}>
+                                <div className='d-flex flex-column align-items-center dark-bg shadow p-3'>
+                                    <h3>{game.title}</h3>
+                                    <p className='comment'>{game.desc}</p>
+                                    <Button
+                                    className='main-button arrow w-100 mt-3 fs-5'
+                                    onClick={()=>{
+                                        navigate("/wait",{state:{gameMode:game.code}})
+                                    }}
+                                    >Play</Button>
+                                </div>
+                            </Col>
+                        )
+                    }
+                    </Row>
+                </>
+            }
             </Container>
             :
             <>
@@ -110,6 +126,67 @@ function Home({}) {
             </>
             : <EntryForm />
         }
+        </div>
+    );
+}
+
+
+function RejoinRoom({user,runningRoom,setRunningRoom}) {
+
+    const [timeLeft,setTimeLeft] = useState();
+    const navigate = useNavigate();
+
+    function rejoinRunningRoom()
+    {
+        socket.emit("rejoin_room",{
+            roomId: runningRoom.id,
+            userId: user.userId
+        });
+        navigate(`/play`,{state:{gameMode: runningRoom.gameMode,roomId:runningRoom.id}});
+
+    }
+
+    function leaveRunningRoom()
+    {
+        socket.emit("exit_room",{
+            roomId: runningRoom.id,
+            userId: user.userId
+        });
+        setRunningRoom()
+    }
+
+    function updateTimeLeft()
+    {
+        const newTimeLeft = Math.ceil(Math.max(runningRoom.fullTime - (Date.now()-runningRoom.startTime)/1000,0));
+        setTimeLeft(newTimeLeft);
+
+    }
+
+    useEffect(()=>{
+
+        updateTimeLeft();
+        let timer = setInterval(() => {
+            updateTimeLeft();
+        }, 1000);
+
+        return ()=> {clearInterval(timer);};
+    },[]);
+
+    return (
+        <div className='d-flex flex-column align-items-center dark-bg shadow p-3 w-100'>
+            <h2>Resume <span className='text-bright'>&#123;{games.find((r) => r.code === runningRoom.gameMode).title}</span>&#125; game?</h2>
+            <p className='comment'>
+                {("0"+Math.floor(timeLeft/60)).slice(-2)}:{("0"+Math.floor(timeLeft%60)).slice(-2)}
+            </p>
+            <div className="d-flex align-items-center gap-3">
+                <Button className='main-button secondary arrow'
+                onClick={()=>rejoinRunningRoom()}
+                >Rejoin</Button>
+
+                <Button className='main-button danger arrow'
+                onClick={()=>leaveRunningRoom()}
+                >Leave</Button>
+            </div>
         </div>
     );
 }

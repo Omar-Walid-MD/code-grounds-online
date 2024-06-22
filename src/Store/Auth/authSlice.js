@@ -1,14 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { auth } from '../../Firebase/firebase';
+import { auth, database } from '../../Firebase/firebase';
 import { removeUserFromFirebase, updateUserInfo } from '../../Firebase/DataHandlers/users';
 import { generateAvatar } from '../../Helpers/avatar';
+import { ref, remove } from 'firebase/database';
 
 const initialState = {
     user: null,
     loading: true,
 }
-
-
 
 export const setUser = createAsyncThunk(
     'auth/setUser',
@@ -26,10 +25,12 @@ export const updateUser = createAsyncThunk(
 export const removeUser = createAsyncThunk(
   'auth/removeUser',
   (user) => {
-    removeUserFromFirebase(user);
+    remove(ref(database, 'users/' + user.userId))
+    remove(ref(database, 'usernames/' + user.username))
     console.log("here");
     return user;
 });
+
 
 export const slice = createSlice({
     name: "auth",

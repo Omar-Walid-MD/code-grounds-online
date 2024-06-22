@@ -27,6 +27,33 @@ server.listen(8000,()=>{
 let rooms = [];
 let users = {};
 
+let roomInitialUserData = {
+  classic: {
+
+    online: true,
+    state: {
+      solvedQuestions: []
+    }
+  },
+  fastest: {
+
+    online: true,
+    state: {
+      solvedQuestions: []
+    }
+  }
+}
+
+let roomData = {
+  classic: {
+    fullTime: 5 * 60,
+  },
+  fastest: {
+    fullTime: 5 * 60,
+  
+  }
+}
+
 
 
 io.on("connection",(socket)=>{
@@ -34,19 +61,24 @@ io.on("connection",(socket)=>{
   //LOGIN
   socket.on("login",(user)=>{
     users[socket.id] = user;
-  })
+    
+    const runningRoom = rooms.find((r) => r.users.some((u)=> u.userId === user.userId))
+    if(runningRoom) io.emit("get_running_room",runningRoom);
 
+  })
 
   //DISCONNECT
   socket.on("disconnect",(reason)=>{
     const user = users[socket.id];
     let roomToleaveId = null;
+
     if(user)
     {
-      rooms.forEach((room)=>{
+      rooms.forEach((room)=> {
 
         if(room.users.find((u) => u.userId === user.userId)) roomToleaveId = room.id;
-        room.users = room.users.filter((u) => u.userId !== user.userId);
+        // room.users = room.users.filter((u) => u.userId !== user.userId);
+        room.users = room.users.map((u) => u.userId === user.userId ? {...u,online:false} : u)
       });
       delete users[socket.id];
 
@@ -60,25 +92,40 @@ io.on("connection",(socket)=>{
   //JOIN ROOM
   socket.on("join_room",(data)=>{
     let roomToJoin = rooms.find((room) => room.gameMode === data.gameMode && room.state === "waiting");
+    const userToJoin = {...data.user,...roomInitialUserData[roomToJoin?.gameMode || data.gameMode]}
+
     if(roomToJoin)
     {
-      roomToJoin.users.push(data.user);
+      roomToJoin.users.push(userToJoin);
     }
     else
     {
       roomToJoin = {
         gameMode: data.gameMode,
         id: uuid4(),
-        users: [data.user],
+        users: [userToJoin],
         state: "waiting",
-        startTime: null
+        startTime: null,
+        ...roomData[data.gameMode]
       };
+      console.log(roomToJoin)
       rooms.push(roomToJoin)
     }
 
     socket.join(roomToJoin.id);
     io.to(roomToJoin.id).emit("get_room",roomToJoin);
   });
+
+  socket.on("rejoin_room",(data)=>{
+    const room = rooms.find((r) => r.id === data.roomId);
+    if(room)
+    {
+      room.users = room.users.map((u) => u.userId === data.userId ? {...u,online:true} : u);
+      socket.join(room.id);
+      io.to(room.id).emit("get_room",room);
+    }
+
+  })
 
   //UPDATE ROOM
   socket.on("update_room",(data)=>{
@@ -126,15 +173,14 @@ io.on("connection",(socket)=>{
 
   });
 
-
-
+  
 
   //UPDATE USER IN ROOM
   socket.on("update_user_in_room",(data)=>{
     const room = rooms.find((r) => r.id === data.roomId);
     if(room)
     {
-      room.users = room.users.map((u) => u.userId === data.userId ? data.updatedUser : u);
+      room.users = room.users.map((u) => u.userId === data.userId ? {...u,...data.update} : u);
       io.to(data.roomId).emit("get_room",room);
     }
 
@@ -146,12 +192,13 @@ io.on("connection",(socket)=>{
     if(room)
     {
       room.users = room.users.filter((u) => u.userId !== data.userId);
-      rooms = rooms.filter((r) => r.users.length);
+      rooms = rooms.filter((r) => r.users.filter((u) => u.online).length);
     }
     room = rooms.find((r) => r.id === data.roomId);
     console.log("exiting room");
     io.to(data.roomId).emit("get_room",room);
 
+    console.log(rooms.length)
   })
 
 });

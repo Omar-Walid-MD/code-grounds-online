@@ -20,7 +20,6 @@ import UserAvatar from '../Components/UserAvatar';
 import { updateUserCompletedGames } from '../Firebase/DataHandlers/users';
 import { auth } from '../Firebase/firebase';
 
-const fullTime = 0.1 * 60;
 const waitTime = 2;
 
 function Fastest({}) {
@@ -32,7 +31,7 @@ function Fastest({}) {
 
     const [currentTab,setCurrentTab] = useState(0);
     
-    const [timeUp,setTimeUp] = useState(fullTime);
+    const [timeUp,setTimeUp] = useState(false);
 
     const [resultModal, setResultModal] = useState("");
 
@@ -45,7 +44,6 @@ function Fastest({}) {
     const [roomId,setRoomId] = useState();
 
     const [playingRoom,setPlayingRoom] = useState();
-    const [solvedQuestions,setSolvedQuestions] = useState([]);
 
     const [statusModal, setStatusModal] = useState(false);
 
@@ -54,13 +52,22 @@ function Fastest({}) {
         const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
         if(correct)
         {
+            const solvedQuestions = getSolvedQuestions();
             let newSolvedQuestions = solvedQuestions;
             if(!solvedQuestions.includes(questionIndex))
             {
                 newSolvedQuestions = [...solvedQuestions,questionIndex];
-                setSolvedQuestions(newSolvedQuestions);
+                socket.emit("update_user_in_room",{
+                    roomId: roomId,
+                    userId: user.userId,
+                    update: {
+                        state:
+                        {
+                            solvedQuestions: newSolvedQuestions
+                        }
+                    }
+                })
             }
-
             if(questionIndex === questions.length-1)
             {
                 socket.emit("update_room",{
@@ -88,6 +95,17 @@ function Fastest({}) {
         {
             setResultModal("incorrect");
         }
+    }
+
+    function getSolvedQuestions()
+    {
+        let solvedQuestions = [];
+        if(playingRoom && user)
+        {
+            solvedQuestions = playingRoom.users.find((u) => u.userId === user.userId).state.solvedQuestions;
+        }
+
+        return solvedQuestions;
     }
 
     function getQuestionSolver()
@@ -184,12 +202,12 @@ function Fastest({}) {
         socket.emit("update_user_in_room",{
             roomId: roomId,
             userId: user.userId,
-            updatedUser: {...user,state:{
-                solvedQuestions
-            }}
+            update: {
+                online: true
+            }
         })
         
-    },[roomId, solvedQuestions]);
+    },[roomId,user]);
 
 
     useEffect(()=>{
@@ -226,7 +244,6 @@ function Fastest({}) {
                 
                 <TopBar
                 playingRoom={playingRoom}
-                fullTime={fullTime}
                 setStatusModal={setStatusModal}
                 onTimerEnd={onTimerEnd}
                 onTimerTick={onTimerTick}
@@ -254,7 +271,7 @@ function Fastest({}) {
                                     onSubmit={submitAnswer}
                                     questions={questions}
                                     questionIndex={questionIndex}
-                                    solvedQuestions={solvedQuestions}
+                                    solvedQuestions={getSolvedQuestions()}
 
                                     />
                                 </Col>

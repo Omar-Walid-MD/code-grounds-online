@@ -5,17 +5,27 @@ import { BiStats } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import { MdHourglassBottom } from 'react-icons/md';
 
-function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd,onTimerTick}) {
+function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
+
+    console.log(playingRoom)
 
     const navigate = useNavigate();
-    const [timeLeft,setTimeLeft] = useState(fullTime);
+    const [fullTime,setFullTime] = useState(0);
+    const [timeLeft,setTimeLeft] = useState(0);
+
+    function updateTimeLeft()
+    {
+        const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
+        setTimeLeft(newTimeLeft);
+
+    }
 
     useEffect(()=>{
 
         let timer = null;
         if(playingRoom)
         {
-            
+            updateTimeLeft();
             timer = setInterval(() => {
                 if(timeLeft <= 0)
                 {
@@ -24,9 +34,7 @@ function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd,onTimerTick}) {
                 }
                 else
                 {
-                    const newTimeLeft = Math.ceil(Math.max(fullTime - (Date.now()-playingRoom.startTime)/1000,0));
-                    setTimeLeft(newTimeLeft);
-
+                    updateTimeLeft();
                     if(onTimerTick) onTimerTick();
 
                 }
@@ -36,6 +44,14 @@ function TopBar({playingRoom,fullTime,setStatusModal,onTimerEnd,onTimerTick}) {
 
         return ()=> {clearInterval(timer);};
     },[timeLeft,playingRoom]);
+
+    useEffect(()=>{
+        if(playingRoom)
+        {
+            setFullTime(playingRoom.fullTime);
+            setTimeLeft(playingRoom.fullTime);
+        }
+    },[playingRoom]);
 
     return (
         <Row className='w-100 g-0 dark-bg shadow'>

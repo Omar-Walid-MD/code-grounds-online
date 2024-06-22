@@ -10,3 +10,7 @@ export const games = [
         desc:"Be the first to solve the question to gain a point! Player with the most points wins!"
     }
 ]
+
+export const achievements = {
+    
+}

@@ -19,8 +19,7 @@ import TopBar from '../Components/TopBar';
 import QuestionTab from '../Components/QuestionTab';
 import UserAvatar from '../Components/UserAvatar';
 import { auth } from '../Firebase/firebase';
-
-const fullTime = 0.1 * 60;
+import { updateUser } from '../Store/Auth/authSlice';
 
 function Classic({}) {
 
@@ -31,7 +30,7 @@ function Classic({}) {
 
     const [currentTab,setCurrentTab] = useState(0);
     
-    const [timeUp,setTimeUp] = useState(fullTime);
+    const [timeUp,setTimeUp] = useState(false);
 
     const [resultModal, setResultModal] = useState("");
 
@@ -44,7 +43,6 @@ function Classic({}) {
     const [roomId,setRoomId] = useState();
 
     const [playingRoom,setPlayingRoom] = useState();
-    const [solvedQuestions,setSolvedQuestions] = useState([]);
 
     const [statusModal, setStatusModal] = useState(false);
 
@@ -53,11 +51,21 @@ function Classic({}) {
         const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
         if(correct)
         {
+            const solvedQuestions = getSolvedQuestions();
             let newSolvedQuestions = solvedQuestions;
             if(!solvedQuestions.includes(questionIndex))
             {
                 newSolvedQuestions = [...solvedQuestions,questionIndex];
-                setSolvedQuestions(newSolvedQuestions);
+                socket.emit("update_user_in_room",{
+                    roomId: roomId,
+                    userId: user.userId,
+                    update: {
+                        state:
+                        {
+                            solvedQuestions: newSolvedQuestions
+                        }
+                    }
+                })
             }
 
             if(newSolvedQuestions.length === questions.length)
@@ -83,12 +91,27 @@ function Classic({}) {
 
     }
 
-    function endGame()
+    function getSolvedQuestions()
+    {
+        let solvedQuestions = [];
+        if(playingRoom && user)
+        {
+            solvedQuestions = playingRoom.users.find((u) => u.userId === user.userId).state.solvedQuestions;
+        }
+
+        return solvedQuestions;
+    }
+
+    async function endGame()
     {
         setStatusModal(false);
         setResultModal("end");
         setQuizState("results");
-        if(auth.currentUser) updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+        if(auth.currentUser)
+        {
+            const updatedStats = await updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+            dispatch(updateUser({stats:updatedStats}))
+        }
     }
 
     function onTimerEnd()
@@ -113,10 +136,10 @@ function Classic({}) {
         else navigate("/");
     },[]);
 
-    
 
     useEffect(()=>{
         socket.on("get_room",(room)=>{
+
             setPlayingRoom(room);
             
             if(room)
@@ -125,10 +148,11 @@ function Classic({}) {
                 if(room.questions)
                 {
                     setQuestions(room.questions);
-                    room.users.forEach((user)=>{
-                        if(user.state)
+                    room.users.forEach((playingUser)=>{
+                        if(playingUser.state && user)
                         {
-                            if(user.state.solvedQuestions.length === room.questions.length)
+
+                            if(playingUser.state.solvedQuestions.length === room.questions.length)
                             {
                                 endGame();
                             }
@@ -146,19 +170,20 @@ function Classic({}) {
                 userId: user.userId
             });
         }
-    },[socket,roomId]);
+    },[socket,roomId,user]);
 
     useEffect(()=>{
         if(roomId && user)
         socket.emit("update_user_in_room",{
             roomId: roomId,
             userId: user.userId,
-            updatedUser: {...user,state:{
-                solvedQuestions
-            }}
+            update: {
+                online: true
+            }
         })
+   
         
-    },[roomId, solvedQuestions]);
+    },[roomId,user]);
 
 
     useEffect(()=>{
@@ -188,6 +213,8 @@ function Classic({}) {
         }
     },[questions]);
 
+    console.log(user)
+
     return (
         <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
@@ -199,7 +226,6 @@ function Classic({}) {
                     
                     <TopBar
                     playingRoom={playingRoom}
-                    fullTime={fullTime}
                     setStatusModal={setStatusModal}
                     onTimerEnd={onTimerEnd}
                     />
@@ -230,7 +256,7 @@ function Classic({}) {
 
 
                                     {
-                                        solvedQuestions.includes(i) &&
+                                        getSolvedQuestions().includes(i) &&
                                         <div className='d-flex bg-success align-items-center justify-content-center h-100 px-1' bg="success" style={{right:0,top:0}}>
                                             <FaCheck color='white' size={15} />
                                         </div>
@@ -269,7 +295,7 @@ function Classic({}) {
                                         onSubmit={submitAnswer}
                                         questions={questions}
                                         questionIndex={questionIndex}
-                                        solvedQuestions={solvedQuestions}
+                                        solvedQuestions={getSolvedQuestions()}
 
                                         />
                                     </Col>
@@ -379,7 +405,7 @@ function Classic({}) {
                     </Row>
                 {
                     playingRoom && getSortedRankings(playingRoom.users).map((playingUser,i)=>
-                    <Row className='w-100'>
+                    <Row className={`w-100 ${playingUser?.online ? "text-white" : "text-danger"}`}>
                         <Col className='col-3'>
                             <div className='w-100 d-flex align-items-center justify-content-center gap-3 shadow'>
                                 <div className="d-flex align-items-center gap-3">
