@@ -77,7 +77,7 @@ function Home({}) {
 
     
     return (
-        <div className='page-container d-flex flex-column align-items-center justify-content-center'>
+        <div className='page-container px-3 d-flex flex-column align-items-center justify-content-center'>
         {
             loading ?
             <Spinner className='text-white' />
@@ -92,11 +92,11 @@ function Home({}) {
                 <>
                     <h1>Choose Game</h1>
 
-                    <Row className='mt-3'>
+                    <Row className='mt-3 g-3'>
                     {
                         games.map((game)=>
                         
-                            <Col key={`game-col-${game.code}`}>
+                            <Col className='col-12 col-lg-6' key={`game-col-${game.code}`}>
                                 <div className='d-flex flex-column align-items-center dark-bg shadow p-3'>
                                     <h3>{game.title}</h3>
                                     <p className='comment'>{game.desc}</p>
@@ -167,6 +167,9 @@ function RejoinRoom({user,runningRoom,setRunningRoom}) {
         updateTimeLeft();
         let timer = setInterval(() => {
             updateTimeLeft();
+
+            if(timeLeft <= 0)
+                leaveRunningRoom();
         }, 1000);
 
         return ()=> {clearInterval(timer);};

@@ -92,7 +92,7 @@ function Register({}) {
   
 
     return (
-        <div className='page-container font-mono d-flex flex-column align-items-center justify-content-center gap-2'>
+        <div className='page-container px-3 font-mono d-flex flex-column align-items-center justify-content-center gap-2'>
         {
             loading ?
             <Spinner className='text-white' />

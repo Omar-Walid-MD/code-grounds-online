@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
-import { getCodeOutput, testCode } from '../codeAPI/api';
-import { getSortedRankings, getRankingString } from '../Helpers/rankings';
-import { updateUserCompletedGames } from '../Firebase/DataHandlers/users';
+import { getCodeOutput, testCode } from '../../codeAPI/api';
+import { getSortedRankings, getRankingString } from '../../Helpers/rankings';
+import { updateUserCompletedGames } from '../../Firebase/DataHandlers/users';
 
 import { MdWarning } from "react-icons/md";
 import { MdHourglassBottom } from "react-icons/md";
@@ -11,28 +11,18 @@ import { BiStats } from "react-icons/bi";
 import { IoCheckboxSharp } from "react-icons/io5";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { socket } from '../socketClient/socketClient';
+import { socket } from '../../socketClient/socketClient';
 import { useLocation, useNavigate } from 'react-router';
-import { games } from '../Games/games';
-import CodeSubmit from '../Components/CodeSubmit';
-import TopBar from '../Components/TopBar';
-import QuestionTab from '../Components/QuestionTab';
-import UserAvatar from '../Components/UserAvatar';
-import { auth } from '../Firebase/firebase';
-import { updateUser } from '../Store/Auth/authSlice';
+import { games } from '../../Games/games';
+import CodeSubmit from '../../Components/CodeSubmit';
+import TopBar from '../../Components/TopBar';
+import QuestionTab from '../../Components/QuestionTab';
+import UserAvatar from '../../Components/UserAvatar';
+import { auth } from '../../Firebase/firebase';
+import { updateUser } from '../../Store/Auth/authSlice';
+import StatusModal from '../../Components/StatusModal';
 
 function Classic({}) {
-
-    const [quizState,setQuizState] = useState("running");
-    const [questionIndex,setQuestionIndex] = useState(0);
-
-    const [questions,setQuestions] = useState();
-
-    const [currentTab,setCurrentTab] = useState(0);
-    
-    const [timeUp,setTimeUp] = useState(false);
-
-    const [resultModal, setResultModal] = useState("");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -44,7 +34,20 @@ function Classic({}) {
 
     const [playingRoom,setPlayingRoom] = useState();
 
+    const [quizState,setQuizState] = useState("running");
+    const [questionIndex,setQuestionIndex] = useState(0);
+
+    const [questions,setQuestions] = useState();
+
+    const [currentTab,setCurrentTab] = useState(0);
+    
+    const [timeUp,setTimeUp] = useState(false);
+
+    const [resultModal, setResultModal] = useState("");
     const [statusModal, setStatusModal] = useState(false);
+
+    const questionsScroll = useRef();
+
 
     async function submitAnswer(codeValues,languageValues,questions)
     {
@@ -213,10 +216,22 @@ function Classic({}) {
         }
     },[questions]);
 
-    console.log(user)
+
+    useEffect(() => {
+        const handleQuestionScroll = (e) => {
+          e.preventDefault();
+          e.currentTarget.scrollTo({left:e.currentTarget.scrollLeft + Math.sign(e.deltaY)*100});        
+        };
+    
+        if(questionsScroll.current) questionsScroll.current.addEventListener('wheel', handleQuestionScroll);
+
+            return () => {
+                if(questionsScroll.current) questionsScroll.current.removeEventListener('wheel', handleQuestionScroll);
+            };
+      }, []);
 
     return (
-        <div className='page-container font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
+        <div className='page-container px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
             <Container className='d-flex flex-column justify-content-center align-items-center'>
 
@@ -233,10 +248,8 @@ function Classic({}) {
 
                     <div className='w-100'>
                         <p className="fs-5 text-bright mb-1">Questions</p>
-                        <div className="questions-scroll overflow-x-scroll mb-3"
-                        onWheel={(e)=>{
-                            e.currentTarget.scrollTo({left:e.currentTarget.scrollLeft + Math.sign(e.deltaY)*100});
-                        }}
+                        <div className="scrollbar overflow-x-scroll mb-3"
+                        ref={questionsScroll}
                         >
 
                             <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
@@ -314,7 +327,7 @@ function Classic({}) {
         keyboard={false}
         centered
         >
-            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
+            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 text-center'>
             {
                 resultModal === "correct" ?
                 <>
@@ -383,54 +396,13 @@ function Classic({}) {
         </Modal>
 
 
-        <Modal show={statusModal} onHide={()=>setStatusModal(false)} centered
-        className='status-modal'
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'>
-            <Modal.Header>
-                <Modal.Title className='w-100 text-center fw-semibold'>
-                   Quiz Status
-                </Modal.Title>
-                <Button className='position-absolute main-button me-2' style={{right:0}} onClick={()=>setStatusModal(false)}>Close</Button>
-            </Modal.Header>
-            <Modal.Body className='w-100'>
-                <div className="w-100 d-flex flex-column justify-content-start align-items-start gap-3">
-
-                    <Row className='w-100'>
-                        <Col className='col-3'></Col>
-                        {
-                            questions && questions.map((question)=>
-                            <Col className='text-center'>{question.title}</Col>
-                            )
-                        }
-                    </Row>
-                {
-                    playingRoom && getSortedRankings(playingRoom.users).map((playingUser,i)=>
-                    <Row className={`w-100 ${playingUser?.online ? "text-white" : "text-danger"}`}>
-                        <Col className='col-3'>
-                            <div className='w-100 d-flex align-items-center justify-content-center gap-3 shadow'>
-                                <div className="d-flex align-items-center gap-3">
-                                    {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute" style={{left:20}}></div>}
-                                    {i+1}
-                                    <UserAvatar
-                                    className='border-3 border'
-                                    src={playingUser.avatar}
-                                    style={{height:40}}
-                                    />
-                                </div>
-                                <p className='m-0'>{playingUser.username}</p>
-                            </div>
-                        </Col>
-                        {
-                            playingUser.state && questions && questions.map((question,i)=>
-                            <Col className='d-flex align-items-center justify-content-center fs-3 text-accent'>{playingUser.state.solvedQuestions.includes(i) ? <FaCheck className='text-bright' /> : "--"}</Col>
-                            )
-                        }
-                    </Row>
-                    )
-                }
-                </div>
-            </Modal.Body>
-        </Modal>
+        <StatusModal
+        statusModal={statusModal}
+        setStatusModal={setStatusModal}
+        playingUsers={getSortedRankings(playingRoom?.users || [])}
+        questions={questions}
+        user={user}
+        />
 
             
         </div>

@@ -77,14 +77,14 @@ function Profile({}) {
     console.log(user);
 
     return (
-        <div className='page-container d-flex flex-column align-items-center justify-content-center'>
+        <div className='page-container px-3 d-flex flex-column align-items-center justify-content-center'>
             <Container>
                 {
                     user &&
                     <>
                         <Row className='g-3'>
                             <Col className='col-12'>
-                                <div className="d-flex flex-column align-items-start font-mono text-white dark-bg w-100 d-flex flex-column p-3 gap-3">
+                                <div className="d-flex flex-column align-items-center align-items-md-start font-mono text-white dark-bg w-100 d-flex flex-column p-3 gap-4 gap-md-3">
                                 {
                                     !edit ?
                                     <>
@@ -104,7 +104,7 @@ function Profile({}) {
                                     </>
                                     :
                                     <>
-                                        <div className="d-flex align-items-center gap-5">
+                                        <div className="d-flex flex-column flex-md-row align-items-center gap-5">
                                             <div className="d-flex flex-column gap-3">
                                                 <div className="d-flex align-items-center gap-2 fs-5">
                                                     <span className='comment'>Color:</span>
@@ -130,7 +130,7 @@ function Profile({}) {
                                                 <input type="text" className="main-input fs-3" name='username' value={userEdit.username} onChange={handleUserEdit} />
                                             </div>
                                         </div>
-                                        <div className="w-100 d-flex justify-content-end gap-3">
+                                        <div className="w-100 d-flex justify-content-center justify-content-md-end gap-3">
                                             <Button className='main-button danger'
                                             onClick={()=>discardChanges()}
                                             >Discard</Button>
@@ -174,39 +174,41 @@ function Profile({}) {
                                 </div>
                             </Col>
                         </Row>
-                        <Button className='main-button arrow danger mt-3' onClick={()=>setDeleteModal(true)}>Delete Account</Button>
+                        <div className="d-flex w-100 justify-content-center justify-content-md-start">
+                            <Button className='main-button arrow danger mt-3' onClick={()=>setDeleteModal(true)}>Delete Account</Button>
+                        </div>
                     </>
 
                 }
             </Container>
 
-        <Modal show={deleteModal}
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
-        centered
-        onHide={()=>setDeleteModal(false)}
-        >
-            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
-            {
-                reloginWarning ?
-                <>
-                    <h4 className='w-100 text-center'>Please Log out and Log in again to be able to Delete your account.</h4>
-                    <Button className='main-button danger arrow' onClick={()=>{
-                        dispatch(setUser(null));
-                        auth.signOut();
-                        navigate("/login");
-                    }}>Log out</Button>
-                </>
-                :
-                <>
-                    <h4 className='w-100 text-center'>Are you SURE you want to delete this account?</h4>
-                    <Button className='main-button danger arrow' onClick={()=>confirmDeleteAccount()}>Delete Account</Button>
-                </>
-            }
-            </Modal.Body>
-            <Modal.Footer className='border-0'>
-            
-            </Modal.Footer>
-        </Modal>
+            <Modal show={deleteModal}
+            contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+            centered
+            onHide={()=>setDeleteModal(false)}
+            >
+                <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
+                {
+                    reloginWarning ?
+                    <>
+                        <h4 className='w-100 text-center'>Please Log out and Log in again to be able to Delete your account.</h4>
+                        <Button className='main-button danger arrow' onClick={()=>{
+                            dispatch(setUser(null));
+                            auth.signOut();
+                            navigate("/login");
+                        }}>Log out</Button>
+                    </>
+                    :
+                    <>
+                        <h4 className='w-100 text-center'>Are you SURE you want to delete this account?</h4>
+                        <Button className='main-button danger arrow' onClick={()=>confirmDeleteAccount()}>Delete Account</Button>
+                    </>
+                }
+                </Modal.Body>
+                <Modal.Footer className='border-0'>
+                
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

@@ -27,7 +27,8 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
         height={height}
         theme='editor-theme'
         options={{
-            minimap:{enabled:false}        
+            minimap:{enabled:false},
+            scrollBeyondLastLine:false     
         }}
         
         

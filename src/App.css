@@ -64,6 +64,8 @@
 {
   min-height: 100vh !important;
   background-color: var(--main-bg);
+  padding-top: 150px;
+  padding-bottom: 50px;
   /* position: relative; */
   /* background:  linear-gradient(rgba(44, 76, 51, 0.9),rgba(44, 76, 51, 0.9)), url("assets/space.gif");
   background-size: cover;
@@ -306,18 +308,18 @@ input
   75% {content: "\\ ";}
 }
 
-.questions-scroll:hover
+.scrollbar:hover
 {
   overflow-x: scroll;
 }
-.questions-scroll::-webkit-scrollbar
+.scrollbar::-webkit-scrollbar
 {
-  height: 5px;
+  height: 10px;
   appearance: none;
   background-color: rgba(0, 0, 0, 1);
 }
 
-.questions-scroll::-webkit-scrollbar-thumb
+.scrollbar::-webkit-scrollbar-thumb
 {
   background-color: var(--text-accent);
 }
@@ -364,4 +366,32 @@ input
   background-color: black;
   color: white;
   resize: none;
+}
+
+
+.code-run-input, .code-run-output
+{
+  height: 120px;
+  font-size: 0.85rem
+}
+
+
+
+
+
+
+
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) 
+{
+  .code-run-input
+  {
+    height:100px;
+  }
+
+  .code-run-output
+  {
+    height: 129px;
+  }
 }

@@ -3,8 +3,8 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { games } from '../Games/games';
-import Classic from "../GameComponents/Classic";
-import Fastest from "../GameComponents/Fastest";
+import Classic from "./Games/Classic";
+import Fastest from "./Games/Fastest";
 
 function Play({}) {
 

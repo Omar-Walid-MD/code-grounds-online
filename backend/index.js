@@ -46,10 +46,10 @@ let roomInitialUserData = {
 
 let roomData = {
   classic: {
-    fullTime: 5 * 60,
+    fullTime: 15 * 60,
   },
   fastest: {
-    fullTime: 5 * 60,
+    fullTime: 15 * 60,
   
   }
 }
@@ -108,7 +108,7 @@ io.on("connection",(socket)=>{
         startTime: null,
         ...roomData[data.gameMode]
       };
-      console.log(roomToJoin)
+
       rooms.push(roomToJoin)
     }
 

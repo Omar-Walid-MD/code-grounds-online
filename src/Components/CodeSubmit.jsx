@@ -17,8 +17,6 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
     const [testLoading,setTestLoading] = useState(false);
     const [resultLoading,setResultLoading] = useState(false);
 
-    console.log(codeValues);
-
     const handleEditorChange = (newValue) => {
 
         const editor = editorRef.current;
@@ -95,7 +93,7 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
 
             <Row className='w-100 g-0'>
 
-                <Col className='col-8 pe-3'>
+                <Col className='col-12 col-md-8 p-0 pe-md-3 order-1 order-md-0'>
                     <div className='w-100 h-100'>
                         {
                             languageValues.length > 0  &&
@@ -110,17 +108,17 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
                     </div>
                 </Col>
 
-                <Col className='col-4 overflow-hidden'>
-                    <Row className='g-0'>
-                        <Col className='col-12'>
+                <Col className='col-12 col-md-4 overflow-hidden'>
+                    <Row className='g-2 g-md-0'>
+                        <Col className='col-6 col-md-12'>
                             <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
-                            <textarea className='w-100 textarea-input p-2' style={{height:100,fontSize:"0.85rem"}}
+                            <textarea className='code-run-input w-100 textarea-input p-2'
                             value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
                             ></textarea>
                         </Col>
-                        <Col className='col-12'>
+                        <Col className='col-6 col-md-12'>
                             <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
-                            <textarea className='w-100 textarea-input p-2' style={{height:129,fontSize:"0.85rem"}}
+                            <textarea className='code-run-output w-100 textarea-input p-2'
                             readOnly value={outputValues[questionIndex]}
                             ></textarea>
                         </Col>
