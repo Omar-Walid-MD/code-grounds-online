@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { auth, database } from '../../Firebase/firebase';
-import { removeUserFromFirebase, updateUserInfo } from '../../Firebase/DataHandlers/users';
-import { generateAvatar } from '../../Helpers/avatar';
+import { updateUserInfo } from '../../Firebase/DataHandlers/users';
 import { ref, remove } from 'firebase/database';
+import { deleteUser } from 'firebase/auth';
 
 const initialState = {
     user: null,
@@ -17,20 +17,46 @@ export const setUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'auth/updateUser',
-  (update,{getState}) => {
-    updateUserInfo(getState().auth.user.userId,update);
-    return update;
+  ({anonymous,updatedUser},{getState}) => {
+    if(anonymous)
+    {
+      localStorage.setItem("user",JSON.stringify(updatedUser));
+    }
+    else
+    {
+      updateUserInfo(getState().auth.user,updatedUser);
+    }
+    return updatedUser;
 });
 
 export const removeUser = createAsyncThunk(
   'auth/removeUser',
-  (user) => {
-    remove(ref(database, 'users/' + user.userId))
-    remove(ref(database, 'usernames/' + user.username))
-    console.log("here");
-    return user;
+  ({anonymous,user}) => {
+    if(anonymous)
+    {
+      localStorage.removeItem("user");
+    }
+    else
+    {
+      remove(ref(database, 'users/' + user.userId))
+      remove(ref(database, 'usernames/' + user.username))
+    }
+    return null;
 });
 
+export const signOut = createAsyncThunk(
+  'auth/signOut',
+  ({anonymous,username}) => {
+    if(anonymous)
+    {
+      deleteUser(auth.currentUser);
+      // if(username) remove(ref(database, 'usernames/' + username))
+      localStorage.removeItem("user");
+    }
+    
+    auth.signOut();
+    return null;
+});
 
 export const slice = createSlice({
     name: "auth",
@@ -73,6 +99,18 @@ export const slice = createSlice({
         state.loading = false;
       })
       .addCase(removeUser.rejected, (state, action) => {
+        state.loading = false;
+      })
+
+      //signOut
+      .addCase(signOut.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(signOut.fulfilled, (state, action) => {
+        state.user = null;
+        state.loading = false;
+      })
+      .addCase(signOut.rejected, (state, action) => {
         state.loading = false;
       })
 

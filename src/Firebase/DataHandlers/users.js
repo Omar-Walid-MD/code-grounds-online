@@ -13,12 +13,17 @@ export function registerUser(userId, userInfo)
 
 }
 
-export function updateUserInfo(userId, userInfo)
+export function updateUserInfo(oldUserInfo, updatedUserInfo)
 {
-    update(ref(database, 'users/' + userId), userInfo);
-    if(userInfo.username)
+    update(ref(database, 'users/' + oldUserInfo.userId), updatedUserInfo);
+    if(updatedUserInfo.username)
     {
-        set(ref(database, 'usernames/' + userInfo.username), true);
+        if(updatedUserInfo.username !== oldUserInfo?.username)
+        {
+            set(ref(database, 'usernames/' + updatedUserInfo.username), true);
+            remove(ref(database, 'usernames/' + oldUserInfo.username));
+
+        }
     }
 }
 

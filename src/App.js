@@ -21,17 +21,26 @@ function App() {
     {
       if(user)
       {
-        (async()=>{
-          dispatch(setUser({
-            userId: user.uid,
-            email: user.email,
-            ...await getUser(user.uid)
-          }))
-        })();
+        if(!user.isAnonymous)
+        {
+          (async()=>{
+            dispatch(setUser({
+              userId: user.uid,
+              email: user.email,
+              ...await getUser(user.uid)
+            }))
+          })();
+        }
+        else
+        {
+          dispatch(setUser(JSON.parse(localStorage.getItem("user"))))
+        }
       }
       else dispatch(setUser(null));
     });
   },[]);
+
+
 
   return (
     <div className="">

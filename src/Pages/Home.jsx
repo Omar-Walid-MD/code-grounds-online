@@ -64,7 +64,7 @@ function Home({}) {
     useEffect(()=>{
         if(user?.username)
         {
-            console.log("logged in")
+            // console.log("logged in")
             socket.emit("login",user);
         }
     },[user]);

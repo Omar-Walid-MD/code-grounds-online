@@ -8,6 +8,8 @@ import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom';
 import { usernameExists } from '../Firebase/DataHandlers/users';
+import { signInAnonymously } from 'firebase/auth';
+import { auth } from '../Firebase/firebase';
 
 function EntryForm({}) {
 
@@ -41,11 +43,17 @@ function EntryForm({}) {
 
     function continueAsGuest()
     {
-        dispatch(setUser({
-            userId: uuidv4(),
-            username,
-            avatar: generateAvatarString()
-        }))
+        signInAnonymously(auth).then(()=>{
+
+            console.log("this should be it");
+            const user = {
+                userId: uuidv4(),
+                username,
+                avatar: generateAvatarString()
+            }
+            dispatch(setUser(user));
+            localStorage.setItem("user",JSON.stringify(user));
+        })
     }
 
     return (

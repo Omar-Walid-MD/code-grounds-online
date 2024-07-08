@@ -3,7 +3,7 @@ import { Button, Container, Dropdown, Nav, NavDropdown, Navbar } from 'react-boo
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { auth } from '../Firebase/firebase';
-import { setUser } from '../Store/Auth/authSlice';
+import { setUser, signOut } from '../Store/Auth/authSlice';
 import UserAvatar from '../Components/UserAvatar';
 
 function NavBar({}) {
@@ -16,11 +16,10 @@ function NavBar({}) {
     <Navbar
     expand="lg"
     className="app-navbar position-absolute w-100 top-0 dark-bg text-white font-mono py-2">
-        <Container>
+        <Container className='d-flex flex-column flex-sm-row align-items-center gap-3'>
           <Navbar.Brand as={Link} to={"/"}>
             <img src={require("../assets/logo.png")} style={{height:30}} />
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Nav className="">
           {
               user?.username &&
@@ -39,8 +38,7 @@ function NavBar({}) {
                   <Dropdown.Item className='p-0'>
                     <Button className='main-button w-100 danger arrow fs-6'
                     onClick={()=>{
-                      dispatch(setUser(null));
-                      auth.signOut();
+                      dispatch(signOut({anonymous:auth.currentUser.isAnonymous,username: user.username}));
                     }}
                     >Logout</Button>
                   </Dropdown.Item>

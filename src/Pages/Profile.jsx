@@ -39,18 +39,18 @@ function Profile({}) {
     
     function saveChanges()
     {
-        dispatch(updateUser(userEdit));
+        dispatch(updateUser({anonymous:auth.currentUser.isAnonymous,updatedUser: userEdit}));
         setEdit(false);
     }
 
     async function confirmDeleteAccount()
     {
+        let anonymous = auth.currentUser.isAnonymous;
         let error;
         try {
             await deleteUser(auth.currentUser);
         } catch (err) {
             error = err;
-            // console.log(err.code);
         }
 
         
@@ -61,9 +61,9 @@ function Profile({}) {
                 setReloginWarning(true);
             }
         }
-        else
+        else if(!anonymous)
         {
-            dispatch(removeUser(user));
+            dispatch(removeUser({anonymous,user}));
         }
     }
 
@@ -73,8 +73,6 @@ function Profile({}) {
             navigate("/");
         }
     },[user,loading]);
-
-    console.log(user);
 
     return (
         <div className='page-container px-3 d-flex flex-column align-items-center justify-content-center'>
