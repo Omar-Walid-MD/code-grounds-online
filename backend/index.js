@@ -58,6 +58,11 @@ let roomData = {
 
 io.on("connection",(socket)=>{
 
+  socket.on("try-connect",()=>{
+    //Nothing happens here. Just to check if the server is live.
+    console.log("Connected");
+  });
+
   //LOGIN
   socket.on("login",(user)=>{
     users[socket.id] = user;

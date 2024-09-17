@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import EntryForm from '../Components/EntryForm';
 import { games } from '../Games/games';
@@ -9,6 +9,8 @@ import { setUser } from '../Store/Auth/authSlice';
 import { registerUser, usernameExists } from '../Firebase/DataHandlers/users';
 import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
 import { socket } from '../socketClient/socketClient';
+import Button from '../Components/Button';
+import Loading from '../Components/Loading';
 
 function Home({}) {
 
@@ -64,7 +66,6 @@ function Home({}) {
     useEffect(()=>{
         if(user?.username)
         {
-            // console.log("logged in")
             socket.emit("login",user);
         }
     },[user]);
@@ -77,10 +78,10 @@ function Home({}) {
 
     
     return (
-        <div className='page-container px-3 d-flex flex-column align-items-center justify-content-center'>
+        <div className='page-container main-bg px-3 d-flex flex-column align-items-center justify-content-center'>
         {
             loading ?
-            <Spinner className='text-white' />
+            <Loading />
             :
             user ?
             user.username ?
@@ -97,11 +98,12 @@ function Home({}) {
                         games.map((game)=>
                         
                             <Col className='col-12 col-lg-6' key={`game-col-${game.code}`}>
-                                <div className='d-flex flex-column align-items-center dark-bg shadow p-3'>
+                                <div className='d-flex flex-column align-items-center container-border shadow p-3'>
                                     <h3>{game.title}</h3>
                                     <p className='comment'>{game.desc}</p>
                                     <Button
-                                    className='main-button arrow w-100 mt-3 fs-5'
+                                    className='w-100 mt-3 fs-5'
+                                    arrow
                                     onClick={()=>{
                                         navigate("/wait",{state:{gameMode:game.code}})
                                     }}
@@ -119,7 +121,7 @@ function Home({}) {
                 <form className="entry-form-container font-mono d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
                 <input className='main-input fs-4 w-100' type="text" placeholder='<Enter a username>'
                 value={username} onChange={handleUsername}/>
-                {errorMessage && <p className='m-0 px-2 danger-bg text-white shadow'>{errorMessage}</p>}
+                {errorMessage && <p className='m-0 px-2 bg-danger text-white shadow'>{errorMessage}</p>}
 
                 <Button type='submit' className='main-button arrow w-100' disabled={!username}>Submit</Button>
             </form>
@@ -182,11 +184,15 @@ function RejoinRoom({user,runningRoom,setRunningRoom}) {
                 {("0"+Math.floor(timeLeft/60)).slice(-2)}:{("0"+Math.floor(timeLeft%60)).slice(-2)}
             </p>
             <div className="d-flex align-items-center gap-3">
-                <Button className='main-button secondary arrow'
+                <Button
+                variant='secondary'
+                arrow
                 onClick={()=>rejoinRunningRoom()}
                 >Rejoin</Button>
 
-                <Button className='main-button danger arrow'
+                <Button
+                variant='danger'
+                arrow
                 onClick={()=>leaveRunningRoom()}
                 >Leave</Button>
             </div>

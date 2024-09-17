@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { socket } from '../socketClient/socketClient';
 import { games } from '../Games/games';
 import UserAvatar from '../Components/UserAvatar';
+import Button from '../Components/Button';
 
 const minPlayers = 1;
 const waitingSeconds = 3;
@@ -100,9 +101,9 @@ function WaitingRoom({}) {
     },[loading,user]);
     
     return (
-        <div className='page-container px-3 font-mono text-white d-flex flex-column justify-content-center align-items-center'>
+        <div className='page-container main-bg px-3 font-mono text-white d-flex flex-column justify-content-center align-items-center'>
             <Container className='d-flex flex-column align-items-center gap-3'>
-                <h2 className='text-capitalize dark-bg p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{games.find((g)=>g.code===waitingRoom.gameMode)?.title}</span>}&#125; Game</h2>
+                <h2 className='text-capitalize p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{games.find((g)=>g.code===waitingRoom.gameMode)?.title}</span>}&#125; Game</h2>
                 <div className='d-flex align-items-start justify-content-between'>
                 {
                     timerStarted ? 
@@ -126,7 +127,7 @@ function WaitingRoom({}) {
 
                         <Col key={waitingUser?.userId}>
                             <div className="d-flex gap-2 align-items-end justify-content-center justify-content-lg-start">
-                                <div className={`dark-bg d-flex align-items-center gap-5 pe-5 shadow ${waitingUser?.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
+                                <div className={`d-flex align-items-center gap-5 pe-5 shadow ${waitingUser?.userId === user.userId ? "border-bottom border-4 border-white" : ""}`}>
                                     <UserAvatar
                                     className={`border-4 border-white ${waitingUser?.userId !== user.userId ? "border" : ""}`}
                                     src={waitingUser?.avatar}
@@ -146,7 +147,10 @@ function WaitingRoom({}) {
                     </p>
                 </div>
                 <div className='w-100 d-flex justify-content-center justify-content-md-start mt-5'>
-                    <Button className='main-button arrow danger'
+                    <Button
+                    variant='danger'
+                    arrow
+                    bordered
                     onClick={()=>navigate("/")}
                     >Leave</Button>
                 </div>

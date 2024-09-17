@@ -18,11 +18,7 @@ export const setUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   'auth/updateUser',
   ({anonymous,updatedUser},{getState}) => {
-    if(anonymous)
-    {
-      localStorage.setItem("user",JSON.stringify(updatedUser));
-    }
-    else
+    if(!anonymous)
     {
       updateUserInfo(getState().auth.user,updatedUser);
     }
@@ -32,11 +28,7 @@ export const updateUser = createAsyncThunk(
 export const removeUser = createAsyncThunk(
   'auth/removeUser',
   ({anonymous,user}) => {
-    if(anonymous)
-    {
-      localStorage.removeItem("user");
-    }
-    else
+    if(!anonymous)
     {
       remove(ref(database, 'users/' + user.userId))
       remove(ref(database, 'usernames/' + user.username))
@@ -50,8 +42,6 @@ export const signOut = createAsyncThunk(
     if(anonymous)
     {
       deleteUser(auth.currentUser);
-      // if(username) remove(ref(database, 'usernames/' + username))
-      localStorage.removeItem("user");
     }
     
     auth.signOut();

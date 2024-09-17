@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
+import { Button as BS_Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
+import Button from '../../Components/Button';
 import { getCodeOutput, testCode } from '../../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../../Helpers/rankings';
 
 import { MdWarning } from "react-icons/md";
 import { MdHourglassBottom } from "react-icons/md";
-import { FaCheck } from "react-icons/fa";
+import { FaQuestion, FaCode } from "react-icons/fa";
 import { BiStats } from "react-icons/bi";
 import { IoCheckboxSharp } from "react-icons/io5";
 
 import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../../socketClient/socketClient';
 import { useLocation, useNavigate } from 'react-router';
-import { games } from '../../Games/games';
-import CodeSubmit from '../../Components/CodeSubmit';
-import TopBar from '../../Components/TopBar';
-import QuestionTab from '../../Components/QuestionTab';
+
+import CodeSubmit from '../../Components/PlayComponents/CodeSubmit';
+import TopBar from '../../Components/PlayComponents/TopBar';
+import QuestionTab from '../../Components/PlayComponents/QuestionTab';
 import UserAvatar from '../../Components/UserAvatar';
 import { updateUserCompletedGames } from '../../Firebase/DataHandlers/users';
 import { auth } from '../../Firebase/firebase';
-import StatusModal from '../../Components/StatusModal';
+import StatusModal from '../../Components/PlayComponents/StatusModal';
 
 const waitTime = 2;
 
@@ -237,146 +238,156 @@ function Fastest({}) {
 
 
     return (
-        <div className='page-container px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
+        <div className='page-container main-bg px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
-        <Container className='d-flex flex-column justify-content-center align-items-center'>
+            <Container fluid className='d-flex flex-column justify-content-center align-items-center px-3 px-lg-5'>
 
-        { 
-            quizState==="running" &&
-            <div className="d-flex w-100 flex-column gap-4">
-                
-                <TopBar
-                playingRoom={playingRoom}
-                setStatusModal={setStatusModal}
-                onTimerEnd={onTimerEnd}
-                onTimerTick={onTimerTick}
-                />                
+            { 
+                quizState==="running" &&
+                <div className="d-flex w-100 flex-column gap-5 gap-md-0">
+                    
+                    <TopBar
+                    playingRoom={playingRoom}
+                    setStatusModal={setStatusModal}
+                    onTimerEnd={onTimerEnd}
+                    onTimerTick={onTimerTick}
+                    />                
 
-                {
-                    questions &&
-                    <div className="d-flex flex-column justify-content-start">
-                        <div className="d-flex gap-3 justify-content-start">
-                            <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                            onClick={()=>setCurrentTab(0)}>Question</Button>
-                            <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                            onClick={()=>setCurrentTab(1)}>Code</Button>
-                        </div>
-                        <div className='dark-bg p-3 shadow'>
-                            {
-                                currentTab === 0 &&
-                                <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
+                    {
+                        questions &&
+                        <Row className='w-100 m-0'>
+                            <Col className='col-12 col-md-1 container-border play-sidebar px-0 px-md-3 p-3 pb-lg-0'>
+                                <div className="h-100 d-flex flex-row flex-md-column align-items-center gap-3">
 
-                            }
-                            <Row className={`${currentTab === 1 ? "g-4" : "g-0"}`}>
-                                <Col className='col-12'>
-                                    <CodeSubmit
-                                    visible={currentTab === 1}
-                                    onSubmit={submitAnswer}
-                                    questions={questions}
-                                    questionIndex={questionIndex}
-                                    solvedQuestions={getSolvedQuestions()}
-
-                                    />
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        </Container>
-
-        <CountdownModal
-        show={playingRoom?.untilNextQuestion >= Date.now()}
-        questionSolver={getQuestionSolver()}
-        playingRoom={playingRoom}
-        user={user}
-        />
-
-        
-
-        <Modal show={resultModal!==""}
-        backdrop="static"
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
-        keyboard={false}
-        centered
-        >
-            <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
-            {
-                resultModal === "correct" ?
-                <>
-                    <IoCheckboxSharp className='scale-in text-accent' size={100} />
-                    <p className='text-accent fs-5 fw-semibold'>Correct Answer! Great job!</p>
-                </>
-                : resultModal === "incorrect" ?
-                <>
-                    <MdWarning className='scale-in text-danger' size={100} />
-                    <p className='text-danger fs-5 fw-semibold'>Incorrect Answer...</p>
-                </>
-                : resultModal === "end" && playingRoom.results &&
-                <>
-                    {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
-                    <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
-                {
-                    getSortedRankings(playingRoom.results).map((playingUser,i)=>
-
-                    <Row className='w-100 position-relative'>
-                        
-
-                        <Col className='col-2 d-flex align-items-center justify-content-center'>
-                            {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute me-5"></div>}
-                            {i+1}
-                        </Col>
-                        <Col className='col-6'>
-                            <div className='w-100 d-flex align-items-center justify-content-start gap-3 shadow'>
-                                <div className="d-flex align-items-center gap-2">
-                                    <UserAvatar
-                                    className='border-3 border'
-                                    src={playingUser.avatar}
-                                    style={{height:40}}
-                                    />
+                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===0 ? "selected" : ""} text-white shadow rounded-0 border-0`}
+                                    onClick={()=>setCurrentTab(0)}><FaQuestion size={30} /></BS_Button>
+                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===1 ? "selected" : ""} text-white shadow rounded-0 border-0`}
+                                    onClick={()=>setCurrentTab(1)}><FaCode size={30} /></BS_Button>
                                 </div>
-                                <p className='m-0'>{playingUser.username}</p>
-                            </div>
-                        </Col>
-                        <Col className='col-4 d-flex align-items-center justify-content-center'>{playingUser.state.solvedQuestions.length}/{questions.length}</Col>
-                    </Row>
-                    )
+                            </Col>
+
+                            <Col className='col-12 col-md-11 p-0'>
+                                <div className='d-flex w-100'>
+                                {
+                                    currentTab === 0 ?
+                                    <div className='w-100 d-flex flex-column'>
+                                        <p className="fs-5 bg-primary px-3">Questions</p>
+                                        <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
+                                    </div>
+                                    :
+                                    <div className='w-100 d-flex flex-column'>
+                                        <p className="fs-5 bg-primary m-0 px-3">Code</p>
+                                        <div className='w-100 ps-3 pt-3'>
+                                            <CodeSubmit
+                                            onSubmit={submitAnswer}
+                                            questions={questions}
+                                            questionIndex={questionIndex}
+                                            solvedQuestions={getSolvedQuestions()}
+    
+                                            />
+                                        </div>
+                                    </div>
+                                        
+                                }
+                                </div>
+                            </Col>
+                        </Row>
+                    }
+                </div>
+            }
+            </Container>
+
+            <CountdownModal
+            show={playingRoom?.untilNextQuestion >= Date.now()}
+            questionSolver={getQuestionSolver()}
+            playingRoom={playingRoom}
+            user={user}
+            />
+
+            
+
+            <Modal show={resultModal!==""}
+            backdrop="static"
+            contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white'
+            keyboard={false}
+            centered
+            >
+                <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
+                {
+                    resultModal === "correct" ?
+                    <>
+                        <IoCheckboxSharp className='scale-in text-accent' size={100} />
+                        <p className='text-accent fs-5 fw-semibold'>Correct Answer! Great job!</p>
+                    </>
+                    : resultModal === "incorrect" ?
+                    <>
+                        <MdWarning className='scale-in text-danger' size={100} />
+                        <p className='text-danger fs-5 fw-semibold'>Incorrect Answer...</p>
+                    </>
+                    : resultModal === "end" && playingRoom.results &&
+                    <>
+                        {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                        <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
+                    {
+                        getSortedRankings(playingRoom.results).map((playingUser,i)=>
+
+                        <Row className='w-100 position-relative'>
+                            
+
+                            <Col className='col-2 d-flex align-items-center justify-content-center'>
+                                {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute me-5"></div>}
+                                {i+1}
+                            </Col>
+                            <Col className='col-6'>
+                                <div className='w-100 d-flex align-items-center justify-content-start gap-3 shadow'>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <UserAvatar
+                                        className='border-3 border'
+                                        src={playingUser.avatar}
+                                        style={{height:40}}
+                                        />
+                                    </div>
+                                    <p className='m-0'>{playingUser.username}</p>
+                                </div>
+                            </Col>
+                            <Col className='col-4 d-flex align-items-center justify-content-center'>{playingUser.state.solvedQuestions.length}/{questions.length}</Col>
+                        </Row>
+                        )
+                    }
+                    </>
+
                 }
-                </>
-
-            }
-            </Modal.Body>
-            <Modal.Footer className='border-0'>
-            {
-                resultModal === "correct" ?
-                <Button className='main-button arrow w-100 fs-5' onClick={()=>{
-                    setResultModal("");
-                }}>
-                    Keep going!
-                </Button>
-                : resultModal === "incorrect" ?
-                <Button className='main-button danger arrow w-100 fs-5' onClick={()=>setResultModal("")}>
-                    Try Again
-                </Button>
-                : resultModal === "end" &&
-                <Button className='main-button arrow w-100 fs-5' onClick={()=>{
-                    navigate("/");
-                }}>
-                    End Quiz
-                </Button>
-            }
-            </Modal.Footer>
-        </Modal>
+                </Modal.Body>
+                <Modal.Footer className='border-0'>
+                {
+                    resultModal === "correct" ?
+                    <Button className='main-button arrow w-100 fs-5' onClick={()=>{
+                        setResultModal("");
+                    }}>
+                        Keep going!
+                    </Button>
+                    : resultModal === "incorrect" ?
+                    <Button className='main-button danger arrow w-100 fs-5' onClick={()=>setResultModal("")}>
+                        Try Again
+                    </Button>
+                    : resultModal === "end" &&
+                    <Button className='main-button arrow w-100 fs-5' onClick={()=>{
+                        navigate("/");
+                    }}>
+                        End Quiz
+                    </Button>
+                }
+                </Modal.Footer>
+            </Modal>
 
 
-        <StatusModal
-        statusModal={statusModal}
-        setStatusModal={setStatusModal}
-        playingUsers={getSortedRankings(playingRoom?.users || [])}
-        questions={questions}
-        user={user}
-        />
+            <StatusModal
+            statusModal={statusModal}
+            setStatusModal={setStatusModal}
+            playingUsers={getSortedRankings(playingRoom?.users || [])}
+            questions={questions}
+            user={user}
+            />
 
             
         </div>
@@ -404,7 +415,7 @@ function CountdownModal({show, questionSolver,playingRoom,user}) {
     return (
         <Modal show={show}
         backdrop="static"
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+        contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white'
         keyboard={false}
         centered
         >

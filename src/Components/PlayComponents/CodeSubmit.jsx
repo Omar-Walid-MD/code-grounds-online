@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import CodeEditor from '../Components/CodeEditor';
-import LanguageSelect from '../Components/LanguageSelect';
-import { codeSnippets, languages } from '../codeAPI/langauges';
-import { Button, Col, Row, Spinner } from 'react-bootstrap';
-import { getCodeOutput } from '../codeAPI/api';
+import CodeEditor from './CodeEditor';
+import LanguageSelect from './LanguageSelect';
+import { codeSnippets, languages } from '../../codeAPI/langauges';
+import { Col, Row, Spinner } from 'react-bootstrap';
+import { getCodeOutput } from '../../codeAPI/api';
+import Button from '../Button';
 
-function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
+function CodeSubmit({questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
 
     const editorRef = useRef();
 
@@ -54,7 +55,7 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
     {
         setTestLoading(true);
         const output = await getCodeOutput(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
-        setOutputValues(o => o.map((x,i) => i===questionIndex ? output.data.run.output : x));
+        setOutputValues(o => o.map((x,i) => i===questionIndex ? output : x));
         setTestLoading(false);    
     }
 
@@ -80,7 +81,7 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
     },[questionIndex]);
 
     return (
-        <div className={`h-100 p-1 ${visible ? "d-flex" : "d-none"} flex-column gap-3`}>
+        <div className={`w-100 h-100 d-flex flex-column gap-3`}>
             <div className="d-flex gap-3">
                 <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
                 {
@@ -93,14 +94,14 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
 
             <Row className='w-100 g-0'>
 
-                <Col className='col-12 col-md-8 p-0 pe-md-3 order-1 order-md-0'>
-                    <div className='w-100 h-100'>
+                <Col className='col-12 col-md-8 p-0 order-1 order-md-0'>
+                    <div className='w-100 h-100 container-border border-end-0 pt-3 bg-black'>
                         {
                             languageValues.length > 0  &&
                             <CodeEditor
                             handleEditorChange={handleEditorChange}
                             editorRef={editorRef}
-                            height="300px"
+                            height="400px"
                             defaultLanguage='python'
                             language={languageValues[questionIndex]}
                             />
@@ -108,27 +109,30 @@ function CodeSubmit({visible=false,questions,onSubmit,questionIndex=0,solvedQues
                     </div>
                 </Col>
 
-                <Col className='col-12 col-md-4 overflow-hidden'>
-                    <Row className='g-2 g-md-0'>
-                        <Col className='col-6 col-md-12'>
-                            <p className='w-100 text-center mb-0 bg-success py-1'>Input</p>
-                            <textarea className='code-run-input w-100 textarea-input p-2'
+                <Col className='col-12 col-md-4'>
+                    <div className='h-100 w-100 d-flex flex-column justify-content-start align-items-stretch'>
+                        <div className='h-100 w-100 d-flex flex-column'>
+                            <p className='w-100 text-center mb-0 bg-primary py-1'>Input</p>
+                            <textarea className='h-100 w-100 textarea-input p-2 container-border'
                             value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
+                            placeholder='>> Your Input Here'
                             ></textarea>
-                        </Col>
-                        <Col className='col-6 col-md-12'>
-                            <p className='w-100 text-center mb-0 bg-success py-1'>Output</p>
-                            <textarea className='code-run-output w-100 textarea-input p-2'
+                        </div>
+                        <div className='h-100 w-100 d-flex flex-column'>
+                            <p className='w-100 text-center mb-0 bg-primary py-1'>Output</p>
+                            <textarea className='h-100 w-100 textarea-input p-2 container-border'
                             readOnly value={outputValues[questionIndex]}
+                            placeholder='>> Your Output Here'
                             ></textarea>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </Col>
             </Row>
             {
                 !resultLoading ?
                 <Button
-                className="main-button arrow w-100 fs-5"
+                className="w-100 fs-5"
+                arrow
                 disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
                 onClick={async ()=>{
                     setResultLoading(true);

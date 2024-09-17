@@ -1,9 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import Editor from "../Pages/Editor";
 import Play from "../Pages/Play";
 import Home from "../Pages/Home";
-import Main from "../Layout/Main";
+import MainLayout from "../Layout/MainLayout";
+import PlayLayout from "../Layout/PlayLayout";
+
 import WaitingRoom from "../Pages/WaitingRoom";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "",
-                element: <Main />,
+                element: <MainLayout />,
                 children: [
                     {
                         path: "",
@@ -26,11 +27,6 @@ const router = createBrowserRouter([
                     {
                         path: "/wait",
                         element: <WaitingRoom />,
-                        children: []
-                    },
-                    {
-                        path: "play",
-                        element: <Play />,
                         children: []
                     },
                     {
@@ -46,6 +42,17 @@ const router = createBrowserRouter([
                     {
                         path: "profile",
                         element: <Profile />,
+                        children: []
+                    }
+                ]
+            },
+            {
+                path: "",
+                element: <PlayLayout />,
+                children: [
+                    {
+                        path: "play",
+                        element: <Play />,
                         children: []
                     }
                 ]

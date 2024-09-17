@@ -18,7 +18,7 @@ export async function getCodeOutput(code,language,input="")
         "stdin": input
 
     });
-    return res;
+    return res.data.run.output;
 }
 
 export async function testCode(code,language,question)

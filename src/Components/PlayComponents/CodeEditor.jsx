@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Editor, loader } from '@monaco-editor/react';
-import { codeSnippets } from '../codeAPI/langauges';
+import { codeSnippets } from '../../codeAPI/langauges';
 
 function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python",language}) {
 
@@ -14,6 +14,7 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
                 'editor.background': '#000000',
                 'editor.lineHighlightBorder': '#000000'
             },
+            
         });
 
         monaco.editor.addKeybindingRule({
@@ -28,7 +29,8 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
         theme='editor-theme'
         options={{
             minimap:{enabled:false},
-            scrollBeyondLastLine:false     
+            scrollBeyondLastLine:false,
+            fontSize: "16rem"    
         }}
         
         

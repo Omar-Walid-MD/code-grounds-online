@@ -1,13 +1,13 @@
 import React from 'react';
 import { Col, Modal, Row, Button } from 'react-bootstrap';
-import UserAvatar from './UserAvatar';
+import UserAvatar from '../UserAvatar';
 import { FaCheck } from 'react-icons/fa';
 
 function StatusModal({statusModal,setStatusModal,playingUsers,questions,user}) {
     return (
         <Modal show={statusModal} onHide={()=>setStatusModal(false)} centered
         className='status-modal'
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'>
+        contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white'>
             <Modal.Header>
                 <Modal.Title className='w-100 text-center fw-semibold'>
                    Quiz Status

@@ -1,17 +1,17 @@
 import React from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { languages } from '../codeAPI/langauges';
+import { languages } from '../../codeAPI/langauges';
 
 function LanguageSelect({language,setLanguage}) {
 
 
     return (
         <Dropdown>
-            <Dropdown.Toggle className='main-button border-0' id="dropdown-basic">
+            <Dropdown.Toggle className='h-100 main-button bg-primary border-0' id="dropdown-basic">
                 {language.name}
             </Dropdown.Toggle>
 
-            <Dropdown.Menu variant='success'  className='rounded-0 shadow'>
+            <Dropdown.Menu className='language-select bg-black rounded-0 container-border' style={{boxShadow:"0 0 10px rgba(0,0,0,0.75)"}}>
             {
                 languages.map((lang)=>
                     <Dropdown.Item

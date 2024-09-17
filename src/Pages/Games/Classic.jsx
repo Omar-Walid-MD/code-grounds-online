@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
+import { Button as BS_Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
+import Button from '../../Components/Button';
 import { getCodeOutput, testCode } from '../../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../../Helpers/rankings';
 import { updateUserCompletedGames } from '../../Firebase/DataHandlers/users';
 
 import { MdWarning } from "react-icons/md";
-import { MdHourglassBottom } from "react-icons/md";
+import { FaQuestion, FaCode } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 import { BiStats } from "react-icons/bi";
 import { IoCheckboxSharp } from "react-icons/io5";
@@ -13,14 +14,14 @@ import { IoCheckboxSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '../../socketClient/socketClient';
 import { useLocation, useNavigate } from 'react-router';
-import { games } from '../../Games/games';
-import CodeSubmit from '../../Components/CodeSubmit';
-import TopBar from '../../Components/TopBar';
-import QuestionTab from '../../Components/QuestionTab';
+
+import CodeSubmit from '../../Components/PlayComponents/CodeSubmit';
+import TopBar from '../../Components/PlayComponents/TopBar';
+import QuestionTab from '../../Components/PlayComponents/QuestionTab';
 import UserAvatar from '../../Components/UserAvatar';
 import { auth } from '../../Firebase/firebase';
 import { updateUser } from '../../Store/Auth/authSlice';
-import StatusModal from '../../Components/StatusModal';
+import StatusModal from '../../Components/PlayComponents/StatusModal';
 
 function Classic({}) {
 
@@ -39,7 +40,7 @@ function Classic({}) {
 
     const [questions,setQuestions] = useState();
 
-    const [currentTab,setCurrentTab] = useState(0);
+    const [currentTab,setCurrentTab] = useState(1);
     
     const [timeUp,setTimeUp] = useState(false);
 
@@ -231,13 +232,13 @@ function Classic({}) {
       }, []);
 
     return (
-        <div className='page-container px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
+        <div className='page-container main-bg px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
                     
-            <Container className='d-flex flex-column justify-content-center align-items-center'>
+            <Container fluid className='d-flex flex-column justify-content-center align-items-center px-3 px-lg-5'>
 
             { 
                 quizState==="running" &&
-                <div className="d-flex w-100 flex-column gap-4">
+                <div className="d-flex w-100 flex-column gap-5 gap-md-0">
                     
                     <TopBar
                     playingRoom={playingRoom}
@@ -245,76 +246,88 @@ function Classic({}) {
                     onTimerEnd={onTimerEnd}
                     />
 
-
-                    <div className='w-100'>
-                        <p className="fs-5 text-bright mb-1">Questions</p>
-                        <div className="scrollbar overflow-x-scroll mb-3"
-                        ref={questionsScroll}
-                        >
-
-                            <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
-                            {
-                                questions && questions.map((question,i)=>
-
-                                <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
-                                    <Button className='w-100 fs-5 rounded-0 bg-dark border-0'
-                                    style={{color:"unset"}}
-                                    onClick={()=>{
-                                        setQuestionIndex(i);
-                                        setCurrentTab(0);
-                                    }}
-                                    >
-                                    {question.title}
-                                    </Button>
-
-
-                                    {
-                                        getSolvedQuestions().includes(i) &&
-                                        <div className='d-flex bg-success align-items-center justify-content-center h-100 px-1' bg="success" style={{right:0,top:0}}>
-                                            <FaCheck color='white' size={15} />
-                                        </div>
-                                    }
-
-
-                                    <div className='position-absolute d-flex align-items-center justify-content-center gap-2'
-                                    style={{width:"min(200px,18vw)",bottom:"-40px"}}
-                                    >
-                                    </div>
-                                </div>
-                                )
-                            }
-                            </div>
-                        </div>
-                    </div>
                     {
                         questions &&
-                        <div className="d-flex flex-column justify-content-start">
-                            <div className="d-flex gap-3 justify-content-start">
-                                <Button className={`main-button ${currentTab === 0 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                                onClick={()=>setCurrentTab(0)}>Question</Button>
-                                <Button className={`main-button px-4 ${currentTab === 1 ? "dark" : "bg-transparent border-0 shadow-sm"}`}
-                                onClick={()=>setCurrentTab(1)}>Code</Button>
-                            </div>
-                            <div className='dark-bg p-3 shadow'>
-                                {
-                                    currentTab === 0 &&
-                                    <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
-                                    
-                                }
-                                <Row className={`${currentTab === 1 ? "g-4" : "g-0"}`}>
-                                    <Col className='col-12'>
-                                        <CodeSubmit
-                                        visible={currentTab === 1}
-                                        onSubmit={submitAnswer}
-                                        questions={questions}
-                                        questionIndex={questionIndex}
-                                        solvedQuestions={getSolvedQuestions()}
+                        
+                        <Row className='w-100 m-0'>
+                            <Col className='col-12 col-md-1 container-border play-sidebar px-0 px-md-3 p-3 pb-lg-0'>
+                                <div className="h-100 d-flex flex-row flex-md-column align-items-center gap-3">
 
-                                        />
-                                    </Col>
-                                </Row>
-                            </div>
-                        </div>
+                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===0 ? "selected" : ""} text-white shadow rounded-0 border-0`}
+                                    onClick={()=>setCurrentTab(0)}><FaQuestion size={30} /></BS_Button>
+                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===1 ? "selected" : ""} text-white shadow rounded-0 border-0`}
+                                    onClick={()=>setCurrentTab(1)}><FaCode size={30} /></BS_Button>
+                                </div>
+                            </Col>
+                            <Col className='col-12 col-md-11 p-0'>
+                                <div className='d-flex w-100'>
+                                    {
+                                        currentTab === 0 ?
+                                        <div className='w-100 d-flex flex-column'>
+                                            <div className='w-100'>
+                                                <p className="fs-5 bg-primary px-3">Questions</p>
+                                                <div className="d-flex scrollbar overflow-x-scroll mb-3"
+                                                ref={questionsScroll}
+                                                >
+
+                                                    <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
+                                                    {
+                                                        questions && questions.map((question,i)=>
+                                                        
+                                                        <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
+                                                            <BS_Button variant='transparent' className='w-100 fs-5 rounded-0 border-0'
+                                                            style={{color:"unset"}}
+                                                            onClick={()=>{
+                                                                setQuestionIndex(i);
+                                                                setCurrentTab(0);
+                                                            }}
+                                                            >
+                                                            {question.title}
+                                                            </BS_Button>
+
+
+                                                            {
+                                                                getSolvedQuestions().includes(i) &&
+                                                                <div className='d-flex bg-success align-items-center justify-content-center h-100 px-1' bg="success" style={{right:0,top:0}}>
+                                                                    <FaCheck color='white' size={15} />
+                                                                </div>
+                                                            }
+
+
+                                                            {/* <div className='position-absolute d-flex align-items-center justify-content-center gap-2'
+                                                            style={{width:"min(200px,18vw)",bottom:"-40px"}}
+                                                            >
+                                                            </div> */}
+                                                        </div>
+                                                        )
+                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
+                                        </div>
+                                        :
+                                        <div className='w-100 d-flex flex-column'>
+                                            <p className="fs-5 bg-primary m-0 px-3">Code</p>
+                                            <div className='w-100 ps-3 pt-3'>
+                                                <CodeSubmit
+                                                onSubmit={submitAnswer}
+                                                questions={questions}
+                                                questionIndex={questionIndex}
+                                                solvedQuestions={getSolvedQuestions()}
+        
+                                                />
+                                            </div>
+                                        </div>
+                                            
+                                    }
+                                </div>
+                            </Col>
+                        </Row>
+                            
+                            
+
+                           
                     }
                 </div>
             }
@@ -323,7 +336,7 @@ function Classic({}) {
 
         <Modal show={resultModal!==""}
         backdrop="static"
-        contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+        contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white'
         keyboard={false}
         centered
         >

@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, getRedirectResult, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { Button, Container, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import { auth, gitHubProvider, googleProvider } from '../Firebase/firebase';
 import { getUser, registerUser } from '../Firebase/DataHandlers/users';
 import { useLocation, useNavigate } from 'react-router';
@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../Store/Auth/authSlice';
 import { Link } from 'react-router-dom';
 import { generateAvatar, generateAvatarString } from '../Helpers/avatar';
+import Button from '../Components/Button';
 
 function Register({}) {
 
@@ -92,7 +93,7 @@ function Register({}) {
   
 
     return (
-        <div className='page-container px-3 font-mono d-flex flex-column align-items-center justify-content-center gap-2'>
+        <div className='page-container main-bg px-3 font-mono d-flex flex-column align-items-center justify-content-center gap-2'>
         {
             loading ?
             <Spinner className='text-white' />
@@ -118,20 +119,20 @@ function Register({}) {
                         name='confirmPassword' value={registerInfo.confirmPassword} onChange={handleRegisterInfo} />
                     </div>
                     
-                    {errorMessage && <p className='m-0 px-2 danger-bg text-white shadow'>{errorMessage}</p>}
-                    <Button type='submit' className='main-button arrow w-100'
+                    {errorMessage && <p className='m-0 px-2 bg-danger text-white shadow'>{errorMessage}</p>}
+                    <Button type='submit' arrow className='w-100'
                     disabled={!(registerInfo.email && registerInfo.password && registerInfo.confirmPassword)}
                     >Register</Button>
                 </form>
                 <p className='m-0 comment fs-5'>or</p>
                 <div className='auth-form-container d-flex flex-column align-items-center gap-3'>
-                    <Button className='main-button secondary arrow w-100'
+                    <Button arrow bordered className='w-100'
                     onClick={()=>handleSignUp("google")}
                     >Sign up with Google <FaGoogle /></Button>
                 </div>
             </>
         }
-        <Button as={Link} to={"/"} className='main-button danger mt-5'>Back</Button>
+        <Button linkTo={"/"} variant='danger' bordered className='mt-5'>Back</Button>
         </div>
     );
 }

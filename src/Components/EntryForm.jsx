@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { setUser } from '../Store/Auth/authSlice';
@@ -10,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { usernameExists } from '../Firebase/DataHandlers/users';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../Firebase/firebase';
+import Button from './Button';
 
 function EntryForm({}) {
 
@@ -65,25 +65,33 @@ function EntryForm({}) {
                 value={username} onChange={handleUsername}/>
                 {errorMessage && <p className='m-0 px-2 danger-bg text-white shadow'>{errorMessage}</p>}
 
-                <Button type='submit' className='main-button arrow w-100' disabled={!username}>Join</Button>
+                <Button arrow type='submit' className='w-100' disabled={!username}>Join</Button>
                 <p className='m-0 mt-3 comment fs-5'>or if you've been here before</p>
                 <div className="d-flex align-items-center gap-4 w-100">
-                    <Button type='button' as={Link} to={"/login"} className='main-button arrow secondary w-100'>Log in</Button>
+                    <Button type='button' arrow linkTo={"/login"} bordered className='w-100'>Log in</Button>
                 </div>
             </form>
             : stage===1 &&
-            <form className="entry-form-containter font-mono d-flex flex-column align-items-center gap-3 text-white">
-                <Button type='button' className='main-button arrow w-100'
-                onClick={()=>continueAsGuest()}>Continue as Guest</Button>
-                <p className='m-0 mt-3 comment fs-5'>or if you want to save your progress</p>
-                <Button type='button' as={Link} to={"register"} state={{username}} className='main-button secondary arrow w-100'>Register</Button>
+            <form className="entry-form-containter font-mono text-white text-center d-flex flex-column align-items-center gap-3 gap-md-5">
+                <div style={{width:"min(350px,calc(100vw - 2rem)"}}>
+                    <p className='m-0 mb-3 comment fs-5'>quick play</p>
+                    <Button type='button' arrow className='w-100'
+                    onClick={()=>continueAsGuest()}>Continue as Guest</Button>
+                </div>
+
+                <div style={{width:"min(350px,calc(100vw - 2rem)"}}>
+                    <p className='m-0 mb-3 comment fs-5'>to save your progress</p>
+                    <Button type='button' linkTo="register" linkState={{username}} arrow bordered className='w-100'>Register</Button>
+                </div>
+                
+                {
+                    stage===1 &&
+                    
+                    <div style={{marginTop:"1rem"}}>
+                        <Button variant='danger' bordered onClick={()=>setStage(0)}>Back</Button>
+                    </div>
+                }
             </form>
-        }
-        {
-            stage===1 &&
-            
-            <Button className='main-button danger mt-5'
-            onClick={()=>setStage(0)}>Back</Button>
         }
         </>
     );
