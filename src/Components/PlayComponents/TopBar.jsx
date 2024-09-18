@@ -10,7 +10,7 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
 
     const navigate = useNavigate();
     const [fullTime,setFullTime] = useState(0);
-    const [timeLeft,setTimeLeft] = useState(0);
+    const [timeLeft,setTimeLeft] = useState(null);
 
     const [leaveModal,setLeaveModal] = useState(false);
 
@@ -48,8 +48,9 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
     useEffect(()=>{
         if(playingRoom)
         {
-            setFullTime(playingRoom.fullTime);
-            setTimeLeft(playingRoom.fullTime);
+            const f = playingRoom.fullTime;
+            setFullTime(f);
+            setTimeLeft(f);
         }
     },[playingRoom]);
 
@@ -71,10 +72,10 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                 <Col className='col-12 col-md-4'>
                     <div className="d-flex w-100 flex-column justify-content-center align-items-center gap-2">
                         <div className="d-flex gap-2 align-items-center">
-                            <MdHourglassBottom className={(timeLeft >= 60 || !timeLeft) ? "text-secondary" : "text-danger time-up-icon"} size={25}/>
+                            <MdHourglassBottom className={(timeLeft >= 60 || timeLeft===null) ? "text-secondary" : "text-danger time-up-icon"} size={25}/>
                             <p className='m-0 fs-5'>
                             {
-                                timeLeft ?
+                                timeLeft!==null ?
                                 <>
                                     {("0"+Math.floor(timeLeft/60)).slice(-2)}:{("0"+Math.floor(timeLeft%60)).slice(-2)}
                                 </>
@@ -84,11 +85,11 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                             </p>
                         </div>
                         <div className="w-100 time-bar-bg bg-white overflow-hidden">
-                            <div className={`${(timeLeft >= 60 || !timeLeft) ? "bg-secondary" : "bg-danger"} time-bar-fill`} style={{height:5,width:`${timeLeft/fullTime*100}%`}}></div>
+                            <div className={`${(timeLeft >= 60 || timeLeft===null) ? "bg-secondary" : "bg-danger"} time-bar-fill`} style={{height:5,width:`${timeLeft/fullTime*100}%`}}></div>
                         </div>
                     </div>
                 </Col>
-                <Col className='col-12 col-md-4 p-2'>
+                <Col className='col-12 col-md-4 pb-2'>
                     <div className="w-100 d-flex align-items-center justify-content-center justify-content-md-end gap-3">
                         <Button variant='secondary' bordered onClick={()=>setStatusModal(true)}>
                             <BiStats size={20} className='me-2'/>
@@ -102,7 +103,7 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
             </Row>
             
             <Modal show={leaveModal}
-            contentClassName='dark-bg text-white font-mono rounded-0 border border-2 border-white'
+            contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white p-2'
             centered
             onHide={()=>setLeaveModal(false)}
             >
@@ -111,10 +112,10 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                     <p className='text-danger'>(Progress in this game would be lost.)</p>
                 </Modal.Body>
                 <Modal.Footer className='border-0 d-flex justify-content-center gap-3'>
-                    <Button variant='danger' arrow onClick={()=>navigate("/")}>
+                    <Button variant='danger' arrow bordered onClick={()=>navigate("/")}>
                         Leave Game
                     </Button>
-                    <Button variant='secondary' bordered onClick={()=>setLeaveModal(false)}>
+                    <Button onClick={()=>setLeaveModal(false)}>
                         Cancel
                     </Button>
                 </Modal.Footer>

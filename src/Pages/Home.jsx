@@ -81,7 +81,7 @@ function Home({}) {
         <div className='page-container main-bg px-3 d-flex flex-column align-items-center justify-content-center'>
         {
             loading ?
-            <Loading />
+            <Loading className='fs-5'/>
             :
             user ?
             user.username ?
@@ -91,7 +91,7 @@ function Home({}) {
                 <RejoinRoom user={user} runningRoom={runningRoom} setRunningRoom={setRunningRoom}/>
                 :
                 <>
-                    <h1>Choose Game</h1>
+                    <h1 className='fw-bold'>Choose Game</h1>
 
                     <Row className='mt-3 g-3'>
                     {

@@ -18,9 +18,9 @@ function NavBar({}) {
     className="app-navbar position-absolute w-100 top-0 main-bg text-white font-mono py-2">
         <Container className='d-flex flex-column flex-sm-row align-items-center gap-3'>
           <Navbar.Brand as={Link} to={"/"}>
-            <img src={require("../assets/logo.png")} style={{height:30}} />
+            <img src={require("../assets/logo.png")} style={{height:40}} />
           </Navbar.Brand>
-          <Nav className="">
+          <Nav>
           {
               user?.username &&
               <Dropdown className='d-flex flex-column align-items-center'>
@@ -29,13 +29,13 @@ function NavBar({}) {
                       <p className='m-0 fs-5'>{user.username}</p>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className='p-0 rounded-0 text-center bg-black container-border' style={{left:"unset",boxShadow:"0 0 10px rgba(0,0,0,0.75)"}}>
+                <Dropdown.Menu className='w-100 p-0 rounded-0 text-center bg-black container-border' style={{left:"unset",boxShadow:"0 0 10px rgba(0,0,0,0.75)"}}>
                 {
                   auth.currentUser && !auth.currentUser.isAnonymous &&
-                  <Dropdown.Item className='p-2' as={Link} to={"/profile"}>Profile</Dropdown.Item>
+                  <Dropdown.Item className='w-100 p-2' as={Link} to={"/profile"}>Profile</Dropdown.Item>
                 }
                   
-                  <Dropdown.Item className='p-0'>
+                  <Dropdown.Item className='p-0 w-100'>
                     <Button className='w-100 fs-6'
                     arrow
                     variant='danger'

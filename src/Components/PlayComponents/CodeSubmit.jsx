@@ -5,8 +5,9 @@ import { codeSnippets, languages } from '../../codeAPI/langauges';
 import { Col, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput } from '../../codeAPI/api';
 import Button from '../Button';
+import Loading from '../Loading';
 
-function CodeSubmit({questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
+function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
 
     const editorRef = useRef();
 
@@ -81,69 +82,73 @@ function CodeSubmit({questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
     },[questionIndex]);
 
     return (
-        <div className={`w-100 h-100 d-flex flex-column gap-3`}>
-            <div className="d-flex gap-3">
-                <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+        //using visible instead of not rendering the element to preserve state of codes, languages, etc...
+        <div className={`${visible ? "d-flex" : "d-none"} w-100 flex-column`}>
+            <p className="fs-5 bg-primary m-0 px-3">Code</p>
+            <div className='w-100 h-100 ps-3 pt-3 d-flex flex-column gap-3'>
+                <div className="d-flex gap-3">
+                    <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                    {
+                        !testLoading ?
+                        <Button arrow bordered onClick={()=>runCode()}>Run Code</Button>
+                        :
+                        <Button variant='secondary' className="d-flex align-items-center justify-content-center"><Loading className='fs-6 text-white' /></Button>
+                    }
+                </div>
+
+                <Row className='w-100 g-0'>
+
+                    <Col className='col-12 col-md-8 p-0 order-1 order-md-0'>
+                        <div className='w-100 h-100 container-border border-end-0 pt-3 bg-black'>
+                            {
+                                languageValues.length > 0  &&
+                                <CodeEditor
+                                handleEditorChange={handleEditorChange}
+                                editorRef={editorRef}
+                                height="400px"
+                                defaultLanguage='python'
+                                language={languageValues[questionIndex]}
+                                />
+                            }
+                        </div>
+                    </Col>
+
+                    <Col className='col-12 col-md-4'>
+                        <div className='h-100 w-100 d-flex flex-column justify-content-start align-items-stretch'>
+                            <div className='h-100 w-100 d-flex flex-column'>
+                                <p className='w-100 text-center mb-0 bg-primary py-1'>Input</p>
+                                <textarea className='h-100 w-100 textarea-input p-2 container-border'
+                                value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
+                                placeholder='>> Your Input Here'
+                                ></textarea>
+                            </div>
+                            <div className='h-100 w-100 d-flex flex-column'>
+                                <p className='w-100 text-center mb-0 bg-primary py-1'>Output</p>
+                                <textarea className='h-100 w-100 textarea-input p-2 container-border'
+                                readOnly value={outputValues[questionIndex]}
+                                placeholder='>> Your Output Here'
+                                ></textarea>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
                 {
-                    !testLoading ?
-                    <Button className="main-button arrow secondary" onClick={()=>runCode()}>Run Code</Button>
+                    !resultLoading ?
+                    <Button
+                    className="w-100 fs-5"
+                    arrow
+                    disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
+                    onClick={async ()=>{
+                        setResultLoading(true);
+                        await onSubmit(codeValues,languageValues,questions);
+                        setResultLoading(false);
+                    }}
+                    >Submit</Button>
                     :
-                    <Button className="main-button secondary px-5 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+                    <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+
                 }
             </div>
-
-            <Row className='w-100 g-0'>
-
-                <Col className='col-12 col-md-8 p-0 order-1 order-md-0'>
-                    <div className='w-100 h-100 container-border border-end-0 pt-3 bg-black'>
-                        {
-                            languageValues.length > 0  &&
-                            <CodeEditor
-                            handleEditorChange={handleEditorChange}
-                            editorRef={editorRef}
-                            height="400px"
-                            defaultLanguage='python'
-                            language={languageValues[questionIndex]}
-                            />
-                        }
-                    </div>
-                </Col>
-
-                <Col className='col-12 col-md-4'>
-                    <div className='h-100 w-100 d-flex flex-column justify-content-start align-items-stretch'>
-                        <div className='h-100 w-100 d-flex flex-column'>
-                            <p className='w-100 text-center mb-0 bg-primary py-1'>Input</p>
-                            <textarea className='h-100 w-100 textarea-input p-2 container-border'
-                            value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
-                            placeholder='>> Your Input Here'
-                            ></textarea>
-                        </div>
-                        <div className='h-100 w-100 d-flex flex-column'>
-                            <p className='w-100 text-center mb-0 bg-primary py-1'>Output</p>
-                            <textarea className='h-100 w-100 textarea-input p-2 container-border'
-                            readOnly value={outputValues[questionIndex]}
-                            placeholder='>> Your Output Here'
-                            ></textarea>
-                        </div>
-                    </div>
-                </Col>
-            </Row>
-            {
-                !resultLoading ?
-                <Button
-                className="w-100 fs-5"
-                arrow
-                disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
-                onClick={async ()=>{
-                    setResultLoading(true);
-                    await onSubmit(codeValues,languageValues,questions);
-                    setResultLoading(false);
-                }}
-                >Submit</Button>
-                :
-                <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
-
-            }
         </div>
     );
 }

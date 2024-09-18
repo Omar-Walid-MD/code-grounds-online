@@ -46,7 +46,7 @@ export const codeSnippets = {
 
 `if __name__ == '__main__':
     for i in range(int(input(""))):
-        value = input("")
+        value = [int(i) for i in input("").split(" ")]
 `,
     "java":
 

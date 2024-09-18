@@ -1,7 +1,8 @@
 import React from 'react';
-import { Col, Modal, Row, Button } from 'react-bootstrap';
+import { Col, Modal, Row } from 'react-bootstrap';
 import UserAvatar from '../UserAvatar';
 import { FaCheck } from 'react-icons/fa';
+import Button from '../Button';
 
 function StatusModal({statusModal,setStatusModal,playingUsers,questions,user}) {
     return (
@@ -12,7 +13,7 @@ function StatusModal({statusModal,setStatusModal,playingUsers,questions,user}) {
                 <Modal.Title className='w-100 text-center fw-semibold'>
                    Quiz Status
                 </Modal.Title>
-                <Button className='position-absolute main-button me-2' style={{right:0}} onClick={()=>setStatusModal(false)}>Close</Button>
+                <Button className='position-absolute me-2' style={{right:0}} onClick={()=>setStatusModal(false)}>Close</Button>
             </Modal.Header>
             <Modal.Body className='w-100'>
                 <div className='w-100 overflow-x-scroll scrollbar pb-3'>

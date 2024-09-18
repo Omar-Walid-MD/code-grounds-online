@@ -22,6 +22,8 @@ import UserAvatar from '../../Components/UserAvatar';
 import { auth } from '../../Firebase/firebase';
 import { updateUser } from '../../Store/Auth/authSlice';
 import StatusModal from '../../Components/PlayComponents/StatusModal';
+import SideBar from '../../Components/PlayComponents/SideBar';
+import { playAudio } from '../../Store/Audio/audioSlice';
 
 function Classic({}) {
 
@@ -40,7 +42,7 @@ function Classic({}) {
 
     const [questions,setQuestions] = useState();
 
-    const [currentTab,setCurrentTab] = useState(1);
+    const [currentTab,setCurrentTab] = useState(0);
     
     const [timeUp,setTimeUp] = useState(false);
 
@@ -84,12 +86,14 @@ function Classic({}) {
             }
             else
             {
+                dispatch(playAudio("correct"));
                 setResultModal("correct");
             }
 
         }
         else
         {
+            dispatch(playAudio("incorrect"));
             setResultModal("incorrect");
         }
 
@@ -108,10 +112,11 @@ function Classic({}) {
 
     async function endGame()
     {
+        dispatch(playAudio("end"));
         setStatusModal(false);
         setResultModal("end");
         setQuizState("results");
-        if(auth.currentUser)
+        if(auth.currentUser && !auth.currentUser.isAnonymous)
         {
             const updatedStats = await updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
             dispatch(updateUser({stats:updatedStats}))
@@ -218,18 +223,6 @@ function Classic({}) {
     },[questions]);
 
 
-    useEffect(() => {
-        const handleQuestionScroll = (e) => {
-          e.preventDefault();
-          e.currentTarget.scrollTo({left:e.currentTarget.scrollLeft + Math.sign(e.deltaY)*100});        
-        };
-    
-        if(questionsScroll.current) questionsScroll.current.addEventListener('wheel', handleQuestionScroll);
-
-            return () => {
-                if(questionsScroll.current) questionsScroll.current.removeEventListener('wheel', handleQuestionScroll);
-            };
-      }, []);
 
     return (
         <div className='page-container main-bg px-3 font-mono text-white position-relative pt-4 d-flex flex-column justify-content-start align-items-center'>
@@ -249,33 +242,26 @@ function Classic({}) {
                     {
                         questions &&
                         
-                        <Row className='w-100 m-0'>
-                            <Col className='col-12 col-md-1 container-border play-sidebar px-0 px-md-3 p-3 pb-lg-0'>
-                                <div className="h-100 d-flex flex-row flex-md-column align-items-center gap-3">
+                        <div className='w-100 d-flex flex-column flex-md-row'>
+                            
+                            <SideBar
+                            currentTab={currentTab}
+                            setCurrentTab={setCurrentTab}
+                            />
 
-                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===0 ? "selected" : ""} text-white shadow rounded-0 border-0`}
-                                    onClick={()=>setCurrentTab(0)}><FaQuestion size={30} /></BS_Button>
-                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===1 ? "selected" : ""} text-white shadow rounded-0 border-0`}
-                                    onClick={()=>setCurrentTab(1)}><FaCode size={30} /></BS_Button>
-                                </div>
-                            </Col>
-                            <Col className='col-12 col-md-11 p-0'>
-                                <div className='d-flex w-100'>
-                                    {
-                                        currentTab === 0 ?
-                                        <div className='w-100 d-flex flex-column'>
-                                            <div className='w-100'>
-                                                <p className="fs-5 bg-primary px-3">Questions</p>
-                                                <div className="d-flex scrollbar overflow-x-scroll mb-3"
-                                                ref={questionsScroll}
-                                                >
-
-                                                    <div className="d-flex pb-2 gap-2" style={{width:"fit-content"}}>
-                                                    {
-                                                        questions && questions.map((question,i)=>
-                                                        
-                                                        <div className={`position-relative d-flex align-items-start justify-content-start border-bottom border-white ${i==questionIndex ? "border-3 text-white" : " border-bottom-0 text-accent"}`} style={{width:260}}>
-                                                            <BS_Button variant='transparent' className='w-100 fs-5 rounded-0 border-0'
+                            <div className='w-100'>
+                                {
+                                    currentTab === 0 &&
+                                    <div className='w-100 d-flex flex-column align-items-start'>
+                                        <p className="w-100 fs-5 bg-primary px-3 m-0">Questions</p>
+                                        <div className='w-100 d-flex flex-row'>
+                                            <div className='scrollbar mb-3' style={{height:"500px"}}>
+                                                <div className='d-flex flex-column pb-4' style={{width:"auto"}}>
+                                                {
+                                                    questions && questions.map((question,i)=>
+                                                    
+                                                        <div className={`position-relative w-100 py-2 container-border border-top-0 border-start-0 ${i==questionIndex ? "text-white bg-secondary" : "  text-accent"}`}>
+                                                            <BS_Button variant='transparent' className='w-100 text-center fs-5 rounded-0 border-0'
                                                             style={{color:"unset"}}
                                                             onClick={()=>{
                                                                 setQuestionIndex(i);
@@ -284,46 +270,38 @@ function Classic({}) {
                                                             >
                                                             {question.title}
                                                             </BS_Button>
-
-
+    
+    
                                                             {
                                                                 getSolvedQuestions().includes(i) &&
-                                                                <div className='d-flex bg-success align-items-center justify-content-center h-100 px-1' bg="success" style={{right:0,top:0}}>
+                                                                <div className='position-absolute top-0 d-flex bg-primary align-items-center justify-content-center h-100 px-1' style={{right:0,top:0}}>
                                                                     <FaCheck color='white' size={15} />
                                                                 </div>
                                                             }
-
-
-                                                            {/* <div className='position-absolute d-flex align-items-center justify-content-center gap-2'
-                                                            style={{width:"min(200px,18vw)",bottom:"-40px"}}
-                                                            >
-                                                            </div> */}
+                                                            
                                                         </div>
-                                                        )
-                                                    }
-                                                    </div>
+                                                    )
+                                                }
                                                 </div>
+
+
+                                           
                                             </div>
                                             <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
                                         </div>
-                                        :
-                                        <div className='w-100 d-flex flex-column'>
-                                            <p className="fs-5 bg-primary m-0 px-3">Code</p>
-                                            <div className='w-100 ps-3 pt-3'>
-                                                <CodeSubmit
-                                                onSubmit={submitAnswer}
-                                                questions={questions}
-                                                questionIndex={questionIndex}
-                                                solvedQuestions={getSolvedQuestions()}
-        
-                                                />
-                                            </div>
-                                        </div>
-                                            
+
+                                    </div>  
                                     }
-                                </div>
-                            </Col>
-                        </Row>
+                                    <CodeSubmit
+                                    visible={currentTab===1}
+                                    onSubmit={submitAnswer}
+                                    questions={questions}
+                                    questionIndex={questionIndex}
+                                    solvedQuestions={getSolvedQuestions()}
+
+                                    />
+                            </div>
+                        </div>
                             
                             
 
@@ -354,7 +332,7 @@ function Classic({}) {
                 </>
                 : resultModal === "end" && playingRoom.results &&
                 <>
-                    {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                    {timeUp && <p className='fs-5 fw-semibold'>Time is up!</p>}
                     <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
                 {
                     getSortedRankings(playingRoom.results).map((playingUser,i)=>

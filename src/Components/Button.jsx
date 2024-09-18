@@ -24,6 +24,7 @@ function Button(props) {
         className={`main-button${props.arrow ? " arrow" : ""} ${props.variant || ""} ${!props.bordered ? " fill" : " bordered"} ${props.className || ""}`}
         onClick={props.onClick}
         disabled={props.disabled}
+        style={props.style || {}}
         >
         {props.children}
         </BS_Button>
@@ -36,6 +37,7 @@ function Button(props) {
         className={`main-button${props.arrow ? " arrow" : ""} ${props.variant || ""} ${!props.bordered ? " fill" : " bordered"} ${props.className || ""}`}
         onClick={props.onClick}
         disabled={props.disabled}
+        style={props.style || {}}
         >
         {props.children}
         </BS_Button>
@@ -46,6 +48,7 @@ Button.propTypes = {
     children: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
+    style: PropTypes.object,
     variant: PropTypes.oneOf(["primary","danger","secondary","transparent"]),
     bordered: PropTypes.bool,
     arrow: PropTypes.bool,

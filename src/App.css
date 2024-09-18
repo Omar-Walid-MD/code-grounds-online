@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'strong';
+  src: url('assets/fonts/Akashi.ttf') format('truetype');
+}
+
 
 :root
 {
@@ -9,8 +14,8 @@
   --bs-primary-rgb: 41, 102, 158 !important;
   --bs-primary-rgb-hover: rgb(53, 124, 189) !important;
 
-  --bs-secondary-rgb: 98, 135, 156 !important;
-  --secondary-hover: rgb(116, 159, 184);
+  --bs-secondary-rgb: 88, 148, 204 !important;
+  --secondary-hover: rgb(105, 164, 219);
 
   --bs-danger-rgb: 201, 83, 83 !important;
   --danger-hover: rgb(222, 102, 102);
@@ -40,6 +45,11 @@
 .font-mono
 {
   font-family: monospace !important;
+}
+
+.font-strong
+{
+  font-family: strong !important;
 }
 
 .page-container
@@ -323,13 +333,16 @@ input
   75% {content: "\\ ";}
 }
 
-.scrollbar:hover
+.scrollbar
 {
-  overflow-x: scroll;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
 }
+
 .scrollbar::-webkit-scrollbar
 {
-  height: 10px;
+  width: 10px; height: 10px;
   appearance: none;
   background-color: rgba(0, 0, 0, 1);
 }
@@ -398,6 +411,37 @@ input
 {
   color: white !important;
   background-color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+.select-tab-label
+{
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+  z-index: 3;
+  left: calc(100% + 2rem);
+
+}
+.select-tab-label-text
+{
+  box-shadow: 2px 0px 0px 2px rgb(var(--bs-primary-rgb));
+}
+.select-tab-label-pointer
+{
+  content: "";
+  position: absolute;
+  left: -1rem;
+  width: 2rem; aspect-ratio: 1;
+
+  box-shadow: 0 0 0 2px rgb(var(--bs-primary-rgb));
+  background: linear-gradient(45deg, black 50%, transparent 0);
+  rotate: 45deg;
+  z-index: -1;
+}
+
+.select-tab-button-container:hover .select-tab-label
+{
+  opacity: 1;
 }
 
 .textarea-input

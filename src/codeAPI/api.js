@@ -30,7 +30,7 @@ export async function testCode(code,language,question)
     // code = wrapCode(questionLoopCode(code,language,question),language);
 
     const res = await getCodeOutput(code,language,input);
-    const codeOuput = res.data.run.output.trim();
+    const codeOuput = res.trim();
     const output = question.outputs.join("\n").trim();
     console.log(input);
     console.log(codeOuput);

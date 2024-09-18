@@ -21,6 +21,8 @@ import UserAvatar from '../../Components/UserAvatar';
 import { updateUserCompletedGames } from '../../Firebase/DataHandlers/users';
 import { auth } from '../../Firebase/firebase';
 import StatusModal from '../../Components/PlayComponents/StatusModal';
+import SideBar from '../../Components/PlayComponents/SideBar';
+import { updateUser } from '../../Store/Auth/authSlice';
 
 const waitTime = 2;
 
@@ -125,12 +127,16 @@ function Fastest({}) {
         return questionSolver;
     }
 
-    function endGame()
+    async function endGame()
     {
         setStatusModal(false);
         setResultModal("end");
         setQuizState("results");
-        if(auth.currentUser) updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+        if(auth.currentUser && !auth.currentUser.isAnonymous)
+        {
+            const updatedStats = await updateUserCompletedGames(user.userId,playingRoom.gameMode,getRankingString(playingRoom.users,user)==="1st");
+            dispatch(updateUser({stats:updatedStats}))
+        }    
     }
 
     function onTimerEnd()
@@ -255,43 +261,32 @@ function Fastest({}) {
 
                     {
                         questions &&
-                        <Row className='w-100 m-0'>
-                            <Col className='col-12 col-md-1 container-border play-sidebar px-0 px-md-3 p-3 pb-lg-0'>
-                                <div className="h-100 d-flex flex-row flex-md-column align-items-center gap-3">
+                        <div className='w-100 d-flex flex-column flex-md-row'>
 
-                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===0 ? "selected" : ""} text-white shadow rounded-0 border-0`}
-                                    onClick={()=>setCurrentTab(0)}><FaQuestion size={30} /></BS_Button>
-                                    <BS_Button variant='transparent' className={`select-tab-button p-2 ${currentTab===1 ? "selected" : ""} text-white shadow rounded-0 border-0`}
-                                    onClick={()=>setCurrentTab(1)}><FaCode size={30} /></BS_Button>
-                                </div>
-                            </Col>
+                            <SideBar
+                            currentTab={currentTab}
+                            setCurrentTab={setCurrentTab}
+                            />
 
-                            <Col className='col-12 col-md-11 p-0'>
-                                <div className='d-flex w-100'>
+                            <div className='w-100'>
                                 {
-                                    currentTab === 0 ?
+                                    currentTab === 0 &&
                                     <div className='w-100 d-flex flex-column'>
                                         <p className="fs-5 bg-primary px-3">Questions</p>
                                         <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
                                     </div>
-                                    :
-                                    <div className='w-100 d-flex flex-column'>
-                                        <p className="fs-5 bg-primary m-0 px-3">Code</p>
-                                        <div className='w-100 ps-3 pt-3'>
-                                            <CodeSubmit
-                                            onSubmit={submitAnswer}
-                                            questions={questions}
-                                            questionIndex={questionIndex}
-                                            solvedQuestions={getSolvedQuestions()}
-    
-                                            />
-                                        </div>
-                                    </div>
                                         
-                                }
-                                </div>
-                            </Col>
-                        </Row>
+                                    }
+                                    <CodeSubmit
+                                    visible={currentTab===1}
+                                    onSubmit={submitAnswer}
+                                    questions={questions}
+                                    questionIndex={questionIndex}
+                                    solvedQuestions={getSolvedQuestions()}
+
+                                    />
+                            </div>
+                        </div>
                     }
                 </div>
             }
@@ -326,7 +321,7 @@ function Fastest({}) {
                     </>
                     : resultModal === "end" && playingRoom.results &&
                     <>
-                        {timeUp && <p className='text-accent fs-5 fw-semibold'>Time is up!</p>}
+                        {timeUp && <p className='fs-5 fw-semibold'>Time is up!</p>}
                         <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
                     {
                         getSortedRankings(playingRoom.results).map((playingUser,i)=>

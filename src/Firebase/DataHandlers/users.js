@@ -8,7 +8,7 @@ export function registerUser(userId, userInfo)
     set(ref(database, 'users/' + userId), userInfo);
     if(userInfo.username)
     {
-        set(ref(database, 'usernames/' + userInfo.username), true);
+        set(ref(database, 'usernames/' + userInfo.username.toLowerCase()), true);
     }
 
 }
@@ -20,8 +20,8 @@ export function updateUserInfo(oldUserInfo, updatedUserInfo)
     {
         if(updatedUserInfo.username !== oldUserInfo?.username)
         {
-            set(ref(database, 'usernames/' + updatedUserInfo.username), true);
-            remove(ref(database, 'usernames/' + oldUserInfo.username));
+            set(ref(database, 'usernames/' + updatedUserInfo.username.toLowerCase()), true);
+            remove(ref(database, 'usernames/' + oldUserInfo.username.toLowerCase()));
 
         }
     }
@@ -45,7 +45,7 @@ export async function getUser(userId)
 
 export async function usernameExists(username)
 {
-    return await get(child(ref(database), `usernames/${username}`)).then((snapshot) => {
+    return await get(child(ref(database), `usernames/${username.toLowerCase()}`)).then((snapshot) => {
             return snapshot.exists()
     });
 }
