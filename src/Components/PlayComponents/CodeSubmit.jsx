@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CodeEditor from './CodeEditor';
 import LanguageSelect from './LanguageSelect';
-import { updatedCodeSnippets, languages } from '../../codeAPI/langauges';
+import { updatedCodeSnippets, languages, wrapCode } from '../../codeAPI/languages';
 import { Col, Row, Spinner } from 'react-bootstrap';
-import { getCodeOutput } from '../../codeAPI/api';
+import { getCodeOutput, testCode } from '../../codeAPI/api';
 import Button from '../Button';
 import Loading from '../Loading';
 
@@ -59,7 +59,7 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
     async function runCode()
     {
         setTestLoading(true);
-        const output = await getCodeOutput(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
+        const output = await testCode(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
         setOutputValues(o => o.map((x,i) => i===questionIndex ? output : x));
         setTestLoading(false);
     }
@@ -119,6 +119,7 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
                                 height="400px"
                                 defaultLanguage='python'
                                 language={languageValues[questionIndex]}
+                                questionIndex={questionIndex}
                                 protectedLines={protectedLines}
                                 />
                             }

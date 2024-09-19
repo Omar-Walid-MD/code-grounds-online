@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button as BS_Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import Button from '../../Components/Button';
-import { getCodeOutput, testCode } from '../../codeAPI/api';
+import { getCodeAnswerResult } from '../../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../../Helpers/rankings';
 
 import { MdWarning } from "react-icons/md";
@@ -55,7 +55,7 @@ function Fastest({}) {
 
     async function submitAnswer(codeValues,languageValues,questions)
     {
-        const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
+        const correct = await getCodeAnswerResult(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
         if(correct || true)
         {
             const solvedQuestions = getSolvedQuestions();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Dropdown, Nav, NavDropdown, Navbar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ function NavBar({}) {
     className="app-navbar position-absolute w-100 top-0 main-bg text-white font-mono py-2">
         <Container className='d-flex flex-column flex-sm-row align-items-center gap-3'>
           <Navbar.Brand as={Link} to={"/"}>
-            <img src={require("../assets/logo.png")} style={{height:40}} />
+            <Logo />
           </Navbar.Brand>
           <Nav>
           {
@@ -61,6 +61,50 @@ function NavBar({}) {
         }
     </Navbar>
     );
+}
+
+function Logo()
+{
+
+  const logoPhases = ["CGO","CoGrOn","CodGroOnl","CodeGrouOnli","Code_GrounOnlin","Code_Ground_Online","Code_Grounds_Online"];
+  const [currentIndex,setCurrentIndex] = useState(0);
+  const [animation,setAnimation] = useState(null);
+
+  useEffect(()=>{
+
+    let timer = null;
+    if(animation!==null)
+    {
+      timer = setInterval(() => {
+        if((currentIndex === logoPhases.length-1 && animation==="f") || (currentIndex === 0 && animation==="b"))
+        {
+          setAnimation(null)
+        }
+        else
+        {
+          setCurrentIndex(i => i + (animation==="f" ? 1 : -1));
+        }
+      }, 30);
+    }
+
+    return ()=>{
+      clearInterval(timer);
+    }
+
+
+  },[animation,currentIndex]);
+
+
+  return (
+    <div className='font-strong fs-3'
+    onMouseEnter={()=>setAnimation("f")}
+    onMouseLeave={()=>setAnimation("b")}
+    >
+      <span className='text-bright'>&lt;</span>
+      <span className='text-white'>{logoPhases[currentIndex]}</span>
+      <span className='text-bright'>/&gt;</span>
+    </div>
+  )
 }
 
 export default NavBar;

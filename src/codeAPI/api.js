@@ -1,5 +1,5 @@
 import axios from "axios";
-import { questionLoopCode, wrapCode } from "./langauges";
+import { questionLoopCode, wrapCode } from "./languages";
 
 const api = axios.create({
     baseURL: "https://emkc.org/api/v2/piston"
@@ -21,7 +21,7 @@ export async function getCodeOutput(code,language,input="")
     return res.data.run.output;
 }
 
-export async function testCode(code,language,question)
+export async function getCodeAnswerResult(code,language,question)
 {
     if(!navigator.onLine) return true;
     
@@ -32,9 +32,19 @@ export async function testCode(code,language,question)
     const codeOuput = res.trim();
     const output = question.outputs.join("\n").trim();
 
-    console.log(input);
-    console.log(codeOuput);
-    console.log(output);
+    // console.log(input);
+    // console.log(codeOuput);
+    // console.log(output);
 
     return output.trim()===codeOuput.trim() //|| true;
+}
+
+export async function testCode(code,language,input)
+{
+    if(!navigator.onLine) return true;
+    
+    const wrappedCode = wrapCode(code,language,1);
+    const res = await getCodeOutput(wrappedCode,language,input);
+    
+    return res.trim();
 }

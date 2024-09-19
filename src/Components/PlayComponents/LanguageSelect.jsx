@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { languages } from '../../codeAPI/langauges';
+import { languages } from '../../codeAPI/languages';
 
 function LanguageSelect({language,setLanguage}) {
 

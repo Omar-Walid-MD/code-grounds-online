@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Editor, loader } from '@monaco-editor/react';
-import { codeSnippets, updatedCodeSnippets } from '../../codeAPI/langauges';
+import { codeSnippets, updatedCodeSnippets } from '../../codeAPI/languages';
 
-function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python",language,protectedLines=[]}) {
+function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python",language,questionIndex,protectedLines=[]}) {
 
     const protectedLinesRef = useRef([]);
     const previousValue = useRef("");
-    const languageChanged = useRef(true);
+    const editorStateChanged = useRef(true);
 
     function getProtectedLineIndexes()
     {
@@ -48,14 +48,14 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
 
     useEffect(()=>{
 
-        languageChanged.current = true;
+        editorStateChanged.current = true;
         if(previousValue.current)
         {
             previousValue.current = updatedCodeSnippets[language.code].code;
         }
         
 
-    },[language]);
+    },[language,questionIndex]);
 
     useEffect(()=>{
         if(editorRef.current)
@@ -92,9 +92,9 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
             editorRef.current = e;
             let isUndoing = false;
             e.onDidChangeModelContent((event)=>{
-                if(isUndoing || languageChanged.current)
+                if(isUndoing || editorStateChanged.current)
                 {
-                    languageChanged.current = false;
+                    editorStateChanged.current = false;
                     return;
                 };
 
@@ -139,7 +139,6 @@ function CodeEditor({editorRef,handleEditorChange,height,defaultLanguage="python
 
 
                 }
-                console.log("huh");
                 previousValue.current = e.getValue();
             });
 

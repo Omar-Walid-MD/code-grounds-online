@@ -7,7 +7,9 @@ function AudioManager() {
     const sounds = {
         correct: require("../assets/audio/correct.mp3"),
         incorrect: require("../assets/audio/incorrect.mp3"),
-        end: require("../assets/audio/end.mp3")
+        end: require("../assets/audio/end.mp3"),
+        countdown: require("../assets/audio/countdown.mp3")
+
     };
 
     const audioPlaying = useSelector(store => store.audio.audioPlaying);

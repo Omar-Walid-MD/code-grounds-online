@@ -5,10 +5,15 @@ import { BiStats } from 'react-icons/bi';
 import { useNavigate } from 'react-router';
 import { MdHourglassBottom } from 'react-icons/md';
 import Button from '../Button';
+import { playAudio } from '../../Store/Audio/audioSlice';
+import { useDispatch } from 'react-redux';
 
 function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+
     const [fullTime,setFullTime] = useState(0);
     const [timeLeft,setTimeLeft] = useState(null);
 
@@ -37,6 +42,11 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                     updateTimeLeft();
                     if(onTimerTick) onTimerTick();
 
+                    if(timeLeft < 60)
+                    {
+                        dispatch(playAudio("countdown"));
+                    }
+
                 }
             }, 1000);
             
@@ -48,7 +58,7 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
     useEffect(()=>{
         if(playingRoom)
         {
-            const f = 30;//playingRoom.fullTime;
+            const f = playingRoom.fullTime;
             setFullTime(f);
             setTimeLeft(f);
         }

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button as BS_Button, Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import Button from '../../Components/Button';
-import { getCodeOutput, testCode } from '../../codeAPI/api';
+import { getCodeAnswerResult } from '../../codeAPI/api';
 import { getSortedRankings, getRankingString } from '../../Helpers/rankings';
 import { updateUserCompletedGames } from '../../Firebase/DataHandlers/users';
 
@@ -50,13 +50,11 @@ function Classic({}) {
     const [resultModal, setResultModal] = useState("");
     const [statusModal, setStatusModal] = useState(false);
 
-    const questionsScroll = useRef();
-
 
     async function submitAnswer(codeValues,languageValues,questions)
     {
-        const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
-        if(correct || true)
+        const correct = await getCodeAnswerResult(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
+        if(correct)
         {
             const solvedQuestions = getSolvedQuestions();
             let newSolvedQuestions = solvedQuestions;
@@ -114,8 +112,6 @@ function Classic({}) {
 
     async function endGame()
     {
-        console.log("this is here");
-
         dispatch(playAudio("end"));
         setStatusModal(false);
         setResultModal("end");
@@ -138,7 +134,7 @@ function Classic({}) {
                     results: playingRoom.users
                 }
             });
-            // endGame();
+            endGame();
 
         }
     }
@@ -174,7 +170,7 @@ function Classic({}) {
                         }
                     });
 
-                    // if(gameEnded) endGame();
+                    if(gameEnded) endGame();
                 }
             }
         });
@@ -268,8 +264,8 @@ function Classic({}) {
                                                 {
                                                     questions && questions.map((question,i)=>
                                                     
-                                                        <div className={`position-relative w-100 py-2 container-border border-top-0 border-start-0 ${i==questionIndex ? "text-white bg-secondary" : "  text-accent"}`}>
-                                                            <BS_Button variant='transparent' className='w-100 text-center fs-5 rounded-0 border-0'
+                                                        <div className={`d-flex w-100 container-border border-top-0 border-start-0 ${i==questionIndex ? "text-white bg-secondary" : "  text-accent"}`}>
+                                                            <BS_Button variant='transparent' className='w-100 text-center fs-5 rounded-0 border-0 p-2'
                                                             style={{color:"unset"}}
                                                             onClick={()=>{
                                                                 setQuestionIndex(i);
@@ -282,7 +278,7 @@ function Classic({}) {
     
                                                             {
                                                                 getSolvedQuestions().includes(i) &&
-                                                                <div className='position-absolute top-0 d-flex bg-primary align-items-center justify-content-center h-100 px-1' style={{right:0,top:0}}>
+                                                                <div className='d-flex bg-primary align-items-center justify-content-center px-1' style={{right:0,top:0}}>
                                                                     <FaCheck color='white' size={15} />
                                                                 </div>
                                                             }

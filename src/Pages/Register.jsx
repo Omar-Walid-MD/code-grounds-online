@@ -30,8 +30,6 @@ function Register({}) {
     {
         setRegisterInfo(l => ({...l,[e.target.name]:e.target.value}));
     }
-
-    console.log(registerInfo);
     
     async function handleSignUp(signUpType)
     {

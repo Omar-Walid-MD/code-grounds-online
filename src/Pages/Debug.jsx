@@ -1,7 +1,7 @@
 import React from 'react';
 import CodeSubmit from '../Components/PlayComponents/CodeSubmit';
 import { getCodeOutput, testCode } from '../codeAPI/api';
-import { wrapCode } from '../codeAPI/langauges';
+import { wrapCode } from '../codeAPI/languages';
 import { questions } from '../questions/questions';
 
 function Debug({}) {
@@ -11,7 +11,6 @@ function Debug({}) {
     {
         const question = questions[0]
         const result = await testCode(codeValues[0],languageValues[0],question);
-        console.log(result);
     }
 
 
