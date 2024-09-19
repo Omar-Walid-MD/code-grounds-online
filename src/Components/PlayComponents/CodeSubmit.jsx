@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CodeEditor from './CodeEditor';
 import LanguageSelect from './LanguageSelect';
-import { codeSnippets, languages } from '../../codeAPI/langauges';
+import { updatedCodeSnippets, languages } from '../../codeAPI/langauges';
 import { Col, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput } from '../../codeAPI/api';
 import Button from '../Button';
@@ -16,6 +16,9 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
     const [inputValues,setInputValues] = useState([]);
     const [outputValues,setOutputValues] = useState([]);
 
+    const [protectedLines,setProtectedLines] = useState([]);
+
+
     const [testLoading,setTestLoading] = useState(false);
     const [resultLoading,setResultLoading] = useState(false);
 
@@ -28,10 +31,11 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
             const currentValue = editor.getValue();
         
             if (currentValue !== newValue) {
-              const range = editor.getModel().getFullModelRange();
-              const edits = [{ range, text: newValue }];
-              editor.executeEdits('', edits);
+                const range = editor.getModel().getFullModelRange();
+                const edits = [{ range, text: newValue }];
+                editor.executeEdits('', edits);
             }
+
         }
     };
 
@@ -43,7 +47,7 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
     function handleLanguage(lang)
     {
         setLanguageValues(l => l.map((x,i) => i===questionIndex ? lang : x));
-        setCodeValues(c => c.map((x,i) => i===questionIndex ? codeSnippets[lang.code] : x));
+        setCodeValues(c => c.map((x,i) => i===questionIndex ? updatedCodeSnippets[lang.code].code : x));
 
     }
 
@@ -57,29 +61,36 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
         setTestLoading(true);
         const output = await getCodeOutput(codeValues[questionIndex],languageValues[questionIndex],inputValues[questionIndex]);
         setOutputValues(o => o.map((x,i) => i===questionIndex ? output : x));
-        setTestLoading(false);    
+        setTestLoading(false);
     }
 
     useEffect(()=>{
         if(!languageValues.length)
         {
-            setLanguageValues(questions.map((q)=>languages[1]));
-            setInputValues(questions.map((x,i)=>"1\n"));
+            setLanguageValues(questions.map((q)=>languages[0]));
+            setInputValues(questions.map((x,i)=>""));
             setOutputValues(questions.map((x,i)=>""));
-            setCodeValues(questions.map((q)=>codeSnippets["python"]));
+            setCodeValues(questions.map((q)=>updatedCodeSnippets[languages[0].code].code));
+            setProtectedLines(updatedCodeSnippets[languages[0].code].protectedLines);
         }
     },[questions]);
 
     useEffect(()=>{
         if(languageValues.length)
         {
-            handleEditorChange(codeSnippets[languageValues[questionIndex].code]);
+            handleEditorChange(updatedCodeSnippets[languageValues[questionIndex].code].code);
+            setProtectedLines(updatedCodeSnippets[languageValues[questionIndex].code].protectedLines);
         }
     },[languageValues]);
 
     useEffect(()=>{
         handleEditorChange(codeValues[questionIndex]);
+        if(languageValues.length)
+        {
+            setProtectedLines(updatedCodeSnippets[languageValues[questionIndex].code].protectedLines);
+        }
     },[questionIndex]);
+
 
     return (
         //using visible instead of not rendering the element to preserve state of codes, languages, etc...
@@ -108,6 +119,7 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
                                 height="400px"
                                 defaultLanguage='python'
                                 language={languageValues[questionIndex]}
+                                protectedLines={protectedLines}
                                 />
                             }
                         </div>
@@ -145,7 +157,9 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
                     }}
                     >Submit</Button>
                     :
-                    <Button className="main-button w-100 d-flex align-items-center justify-content-center"><Spinner className='border-4' style={{height:30,width:30}} /></Button>
+                    <Button className="main-button w-100 d-flex align-items-center justify-content-center">
+                        <Loading className='text-white' />
+                    </Button>
 
                 }
             </div>

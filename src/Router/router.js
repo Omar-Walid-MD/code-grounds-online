@@ -9,6 +9,7 @@ import WaitingRoom from "../Pages/WaitingRoom";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import Profile from "../Pages/Profile";
+import Debug from "../Pages/Debug";
 
 const router = createBrowserRouter([
     {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
                         path: "profile",
                         element: <Profile />,
                         children: []
+                    },
+                    {
+                        path: "debug",
+                        element: <Debug />
                     }
                 ]
             },

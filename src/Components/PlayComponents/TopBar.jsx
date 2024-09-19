@@ -48,13 +48,11 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
     useEffect(()=>{
         if(playingRoom)
         {
-            const f = playingRoom.fullTime;
+            const f = 30;//playingRoom.fullTime;
             setFullTime(f);
             setTimeLeft(f);
         }
     },[playingRoom]);
-
-    console.log(playingRoom);
 
     return (
         <>

@@ -77,25 +77,35 @@ io.on("connection",(socket)=>{
     const user = users[socket.id];
     let roomToleaveId = null;
 
+    console.log("user disconnected");
+
     if(user)
     {
       rooms.forEach((room)=> {
 
         if(room.users.find((u) => u.userId === user.userId)) roomToleaveId = room.id;
-        // room.users = room.users.filter((u) => u.userId !== user.userId);
-        room.users = room.users.map((u) => u.userId === user.userId ? {...u,online:false} : u)
+
+        if(room.state==="waiting")
+        {
+          room.users = room.users.filter((u) => u.userId !== user.userId);
+        }
+        else if(room.state==="running")
+        {
+          room.users = room.users.map((u) => u.userId === user.userId ? ({...u,online:false}) : u)
+        }
       });
       delete users[socket.id];
 
       rooms = rooms.filter((r) => r.users.length);
     }
     const room = rooms.find(r => r.id === roomToleaveId);
-    socket.leave("leaving room");
+    socket.leave(room);
     io.to(roomToleaveId).emit("get_room",room);
   });
   
   //JOIN ROOM
   socket.on("join_room",(data)=>{
+    console.log("yes here? idk");
     let roomToJoin = rooms.find((room) => room.gameMode === data.gameMode && room.state === "waiting");
     const userToJoin = {...data.user,...roomInitialUserData[roomToJoin?.gameMode || data.gameMode]}
 

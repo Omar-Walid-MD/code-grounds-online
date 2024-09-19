@@ -26,7 +26,7 @@ function WaitingRoom({}) {
     const [timerStarted,setTimerStarted] = useState(false);
 
     useEffect(()=>{
-        if(gameMode)
+        if(gameMode && !loading && user)
         {
             socket.emit("join_room",{
                 gameMode,
@@ -34,13 +34,12 @@ function WaitingRoom({}) {
             });
         }
         else navigate("/");
-    },[]);
+    },[loading,user]);  
 
     useEffect(()=>{
         socket.on("get_room",(room)=>{
             setWaitingRoom(room);
         });
-
     },[socket]);
 
     useEffect(()=>{
@@ -103,7 +102,7 @@ function WaitingRoom({}) {
     return (
         <div className='page-container main-bg px-3 font-mono text-white d-flex flex-column justify-content-center align-items-center'>
             <Container className='d-flex flex-column align-items-center gap-3'>
-                <h2 className='text-capitalize p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-accent'>{games.find((g)=>g.code===waitingRoom.gameMode)?.title}</span>}&#125; Game</h2>
+                <h2 className='text-capitalize p-3 shadow'>Starting &#123;{waitingRoom && <span className='text-bright'>{games.find((g)=>g.code===waitingRoom.gameMode)?.title}</span>}&#125; Game</h2>
                 <div className='d-flex align-items-start justify-content-between'>
                 {
                     timerStarted ? 

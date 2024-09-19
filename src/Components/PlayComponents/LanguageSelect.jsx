@@ -14,7 +14,7 @@ function LanguageSelect({language,setLanguage}) {
             <Dropdown.Menu className='language-select bg-black rounded-0 container-border' style={{boxShadow:"0 0 10px rgba(0,0,0,0.75)"}}>
             {
                 languages.map((lang)=>
-                    <Dropdown.Item
+                    <Dropdown.Item disabled={language===lang}
                 className={language===lang ? "active" : ""}
                 onClick={()=>setLanguage(lang)} key={`lang-select-${lang.code}`} >{lang.name}</Dropdown.Item>
                 

@@ -337,4 +337,4 @@ function getQuestions(n)
     return chosenQuestions;
 }
 
-module.exports = {getQuestions};
+module.exports = {getQuestions,questions};

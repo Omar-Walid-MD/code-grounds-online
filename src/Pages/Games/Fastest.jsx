@@ -23,6 +23,8 @@ import { auth } from '../../Firebase/firebase';
 import StatusModal from '../../Components/PlayComponents/StatusModal';
 import SideBar from '../../Components/PlayComponents/SideBar';
 import { updateUser } from '../../Store/Auth/authSlice';
+import ResultModal from '../../Components/PlayComponents/ResultModal';
+import { playAudio } from '../../Store/Audio/audioSlice';
 
 const waitTime = 2;
 
@@ -54,7 +56,7 @@ function Fastest({}) {
     async function submitAnswer(codeValues,languageValues,questions)
     {
         const correct = await testCode(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
-        if(correct)
+        if(correct || true)
         {
             const solvedQuestions = getSolvedQuestions();
             let newSolvedQuestions = solvedQuestions;
@@ -86,7 +88,7 @@ function Fastest({}) {
             }
             else
             {
-                console.log("here should work");
+                dispatch(playAudio("correct"));
                 socket.emit("update_room",{
                     roomId,
                     update: {
@@ -99,6 +101,7 @@ function Fastest({}) {
         }
         else
         {
+            dispatch(playAudio("incorrect"));
             setResultModal("incorrect");
         }
     }
@@ -129,6 +132,7 @@ function Fastest({}) {
 
     async function endGame()
     {
+        dispatch(playAudio("end"));
         setStatusModal(false);
         setResultModal("end");
         setQuizState("results");
@@ -301,79 +305,13 @@ function Fastest({}) {
 
             
 
-            <Modal show={resultModal!==""}
-            backdrop="static"
-            contentClassName='main-bg text-white font-mono rounded-0 border border-2 border-white'
-            keyboard={false}
-            centered
-            >
-                <Modal.Body className='d-flex flex-column align-items-center p-4 gap-3 '>
-                {
-                    resultModal === "correct" ?
-                    <>
-                        <IoCheckboxSharp className='scale-in text-accent' size={100} />
-                        <p className='text-accent fs-5 fw-semibold'>Correct Answer! Great job!</p>
-                    </>
-                    : resultModal === "incorrect" ?
-                    <>
-                        <MdWarning className='scale-in text-danger' size={100} />
-                        <p className='text-danger fs-5 fw-semibold'>Incorrect Answer...</p>
-                    </>
-                    : resultModal === "end" && playingRoom.results &&
-                    <>
-                        {timeUp && <p className='fs-5 fw-semibold'>Time is up!</p>}
-                        <p className='text-bright fs-5 fw-semibold'>{getRankingString(playingRoom.results,user)==="1st" ? "We have a winner! You placed 1st place!" : `Game Over! You placed ${getRankingString(playingRoom.results,user)} place`}</p>
-                    {
-                        getSortedRankings(playingRoom.results).map((playingUser,i)=>
-
-                        <Row className='w-100 position-relative'>
-                            
-
-                            <Col className='col-2 d-flex align-items-center justify-content-center'>
-                                {playingUser.userId === user.userId && <div className="spinning-arrow position-absolute me-5"></div>}
-                                {i+1}
-                            </Col>
-                            <Col className='col-6'>
-                                <div className='w-100 d-flex align-items-center justify-content-start gap-3 shadow'>
-                                    <div className="d-flex align-items-center gap-2">
-                                        <UserAvatar
-                                        className='border-3 border'
-                                        src={playingUser.avatar}
-                                        style={{height:40}}
-                                        />
-                                    </div>
-                                    <p className='m-0'>{playingUser.username}</p>
-                                </div>
-                            </Col>
-                            <Col className='col-4 d-flex align-items-center justify-content-center'>{playingUser.state.solvedQuestions.length}/{questions.length}</Col>
-                        </Row>
-                        )
-                    }
-                    </>
-
-                }
-                </Modal.Body>
-                <Modal.Footer className='border-0'>
-                {
-                    resultModal === "correct" ?
-                    <Button className='main-button arrow w-100 fs-5' onClick={()=>{
-                        setResultModal("");
-                    }}>
-                        Keep going!
-                    </Button>
-                    : resultModal === "incorrect" ?
-                    <Button className='main-button danger arrow w-100 fs-5' onClick={()=>setResultModal("")}>
-                        Try Again
-                    </Button>
-                    : resultModal === "end" &&
-                    <Button className='main-button arrow w-100 fs-5' onClick={()=>{
-                        navigate("/");
-                    }}>
-                        End Quiz
-                    </Button>
-                }
-                </Modal.Footer>
-            </Modal>
+            <ResultModal
+            mode={resultModal}
+            playingRoom={playingRoom}
+            setResultModal={setResultModal}
+            timeUp={timeUp}
+            questions={questions}
+            />
 
 
             <StatusModal
@@ -420,18 +358,18 @@ function CountdownModal({show, questionSolver,playingRoom,user}) {
                 questionSolver?.userId === user?.userId ?
                     
                 <>
-                    <IoCheckboxSharp className='scale-in text-accent' size={100} />
-                    <p className='text-accent fs-5 fw-semibold'>Great job! You gained a point!</p>
+                    <IoCheckboxSharp className='scale-in text-bright' size={100} />
+                    <p className='text-bright fs-5 fw-semibold'>Great job! You gained a point!</p>
                 </>
                 :
                 <>
                     <UserAvatar src={questionSolver?.avatar} className='border scale-in border-4' style={{height:80}}/>
-                    <p className='text-accent fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver?.username}</span></p>
+                    <p className='text-bright fs-5 fw-semibold'>This Question has been solved by <span className='text-white'>{questionSolver?.username}</span></p>
                 </> 
                     
                 
             }
-                <p className='text-accent fs-5 fw-semibold'>Next Question In: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
+                <p className='text-white fs-5 fw-semibold'>Next Question In: {Math.ceil(Math.max((playingRoom?.untilNextQuestion-Date.now())/1000,0))}</p>
 
             </Modal.Body>
             {
