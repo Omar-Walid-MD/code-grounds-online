@@ -1,8 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { auth, database } from '../../Firebase/firebase';
-import { updateUserInfo } from '../../Firebase/DataHandlers/users';
-import { ref, remove } from 'firebase/database';
-import { deleteUser } from 'firebase/auth';
 
 const initialState = {
     audioPlaying: []

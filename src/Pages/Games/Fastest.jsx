@@ -56,7 +56,7 @@ function Fastest({}) {
     async function submitAnswer(codeValues,languageValues,questions)
     {
         const correct = await getCodeAnswerResult(codeValues[questionIndex],languageValues[questionIndex],questions[questionIndex]);
-        if(correct || true)
+        if(correct)
         {
             const solvedQuestions = getSolvedQuestions();
             let newSolvedQuestions = solvedQuestions;

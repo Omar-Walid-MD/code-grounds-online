@@ -7,14 +7,15 @@ import { MdWarning } from "react-icons/md";
 import { IoCheckboxSharp } from "react-icons/io5";
 import { Col, Modal, Row } from 'react-bootstrap';
 import UserAvatar from '../UserAvatar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { disableTutorialPopups } from '../../Store/Settings/settingsSlice';
 
 
 function ResultModal({mode,playingRoom,setResultModal,timeUp,questions}) {
 
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector(store => store.auth.user);
-
 
     return (
         <Modal show={mode!==""}
@@ -88,6 +89,7 @@ function ResultModal({mode,playingRoom,setResultModal,timeUp,questions}) {
                 </Button>
                 : mode === "end" &&
                 <Button className='main-button arrow w-100 fs-5' onClick={()=>{
+                    dispatch(disableTutorialPopups())
                     navigate("/");
                 }}>
                     End Quiz

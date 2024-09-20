@@ -7,6 +7,7 @@ import { MdHourglassBottom } from 'react-icons/md';
 import Button from '../Button';
 import { playAudio } from '../../Store/Audio/audioSlice';
 import { useDispatch } from 'react-redux';
+import TutorialPopup from '../TutorialPopup';
 
 function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
 
@@ -78,7 +79,7 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                     
                 </Col>
                 <Col className='col-12 col-md-4'>
-                    <div className="d-flex w-100 flex-column justify-content-center align-items-center gap-2">
+                    <div className="tutorial-popup-container d-flex w-100 flex-column justify-content-center align-items-center gap-2">
                         <div className="d-flex gap-2 align-items-center">
                             <MdHourglassBottom className={(timeLeft >= 60 || timeLeft===null) ? "text-secondary" : "text-danger time-up-icon"} size={25}/>
                             <p className='m-0 fs-5'>
@@ -95,6 +96,7 @@ function TopBar({playingRoom,setStatusModal,onTimerEnd,onTimerTick}) {
                         <div className="w-100 time-bar-bg bg-white overflow-hidden">
                             <div className={`${(timeLeft >= 60 || timeLeft===null) ? "bg-secondary" : "bg-danger"} time-bar-fill`} style={{height:5,width:`${timeLeft/fullTime*100}%`}}></div>
                         </div>
+                        <TutorialPopup text="Game Timer" position='bottom' />
                     </div>
                 </Col>
                 <Col className='col-12 col-md-4 pb-2'>

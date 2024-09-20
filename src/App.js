@@ -7,6 +7,7 @@ import { getCurrentUser, setUser } from './Store/Auth/authSlice';
 import { auth } from './Firebase/firebase';
 import { getUser } from './Firebase/DataHandlers/users';
 import { socket } from './socketClient/socketClient';
+import { getTutorialPopupsDisbled } from './Store/Settings/settingsSlice';
 
 const api = axios.create({
   baseURL: "https://emkc.org/api/v2/piston"
@@ -74,6 +75,7 @@ function App() {
 
   useEffect(()=>{
     socket.emit("try-connect");
+    dispatch(getTutorialPopupsDisbled())
   },[]);
 
   return (

@@ -67,7 +67,7 @@ function EntryForm({}) {
         {
             stage===0 ?
             <form className="entry-form-containter font-mono d-flex flex-column align-items-center gap-3 text-white" onSubmit={userEnter}>
-                <input className='main-input fs-4 w-100' type="text" placeholder='<Enter your name>'
+                <input className='main-input fs-4 w-100' type="text" placeholder='<Enter your name>' autoFocus
                 value={username} onChange={handleUsername}/>
                 {errorMessage && <p className='m-0 px-2 text-danger shadow'>{errorMessage}</p>}
 

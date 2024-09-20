@@ -7,7 +7,7 @@ import { games } from '../Games/games';
 import UserAvatar from '../Components/UserAvatar';
 import Button from '../Components/Button';
 
-const minPlayers = 2;
+const minPlayers = 1;
 const waitingSeconds = 3;
 
 function WaitingRoom({}) {

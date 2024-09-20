@@ -25,6 +25,7 @@ import StatusModal from '../../Components/PlayComponents/StatusModal';
 import SideBar from '../../Components/PlayComponents/SideBar';
 import { playAudio } from '../../Store/Audio/audioSlice';
 import ResultModal from '../../Components/PlayComponents/ResultModal';
+import TutorialPopup from '../../Components/TutorialPopup';
 
 function Classic({}) {
 
@@ -259,37 +260,37 @@ function Classic({}) {
                                     <div className='w-100 d-flex flex-column align-items-start'>
                                         <p className="w-100 fs-5 bg-primary px-3 m-0">Questions</p>
                                         <div className='w-100 d-flex flex-row'>
-                                            <div className='scrollbar mb-3' style={{height:"500px"}}>
-                                                <div className='d-flex flex-column pb-4' style={{width:"auto"}}>
-                                                {
-                                                    questions && questions.map((question,i)=>
-                                                    
-                                                        <div className={`d-flex w-100 container-border border-top-0 border-start-0 ${i==questionIndex ? "text-white bg-secondary" : "  text-accent"}`}>
-                                                            <BS_Button variant='transparent' className='w-100 text-center fs-5 rounded-0 border-0 p-2'
-                                                            style={{color:"unset"}}
-                                                            onClick={()=>{
-                                                                setQuestionIndex(i);
-                                                                setCurrentTab(0);
-                                                            }}
-                                                            >
-                                                            {question.title}
-                                                            </BS_Button>
-    
-    
-                                                            {
-                                                                getSolvedQuestions().includes(i) &&
-                                                                <div className='d-flex bg-primary align-items-center justify-content-center px-1' style={{right:0,top:0}}>
-                                                                    <FaCheck color='white' size={15} />
-                                                                </div>
-                                                            }
-                                                            
-                                                        </div>
-                                                    )
-                                                }
+                                            <div className='tutorial-popup-container justify-content-center'>
+                                                <div className='scrollbar mb-3' style={{height:"500px"}}>
+                                                    <div className='d-flex flex-column pb-4' style={{width:"auto"}}>
+                                                    {
+                                                        questions && questions.map((question,i)=>
+                                                        
+                                                            <div className={`d-flex w-100 container-border border-top-0 border-start-0 ${i==questionIndex ? "text-white bg-secondary" : "  text-accent"}`}>
+                                                                <BS_Button variant='transparent' className='w-100 text-center fs-5 rounded-0 border-0 p-2'
+                                                                style={{color:"unset"}}
+                                                                onClick={()=>{
+                                                                    setQuestionIndex(i);
+                                                                    setCurrentTab(0);
+                                                                }}
+                                                                >
+                                                                {question.title}
+                                                                </BS_Button>
+        
+        
+                                                                {
+                                                                    getSolvedQuestions().includes(i) &&
+                                                                    <div className='d-flex bg-primary align-items-center justify-content-center px-1' style={{right:0,top:0}}>
+                                                                        <FaCheck color='white' size={15} />
+                                                                    </div>
+                                                                }
+                                                                
+                                                            </div>
+                                                        )
+                                                    }
+                                                    </div>
                                                 </div>
-
-
-                                           
+                                                <TutorialPopup text={"Questions of the game"} position='top'/>
                                             </div>
                                             <QuestionTab question={questions[questionIndex]} questionIndex={questionIndex} />
                                         </div>

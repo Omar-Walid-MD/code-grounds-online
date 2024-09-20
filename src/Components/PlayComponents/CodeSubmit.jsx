@@ -6,6 +6,7 @@ import { Col, Row, Spinner } from 'react-bootstrap';
 import { getCodeOutput, testCode } from '../../codeAPI/api';
 import Button from '../Button';
 import Loading from '../Loading';
+import TutorialPopup from '../TutorialPopup';
 
 function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=[]}) {
 
@@ -98,19 +99,26 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
             <p className="fs-5 bg-primary m-0 px-3">Code</p>
             <div className='w-100 h-100 ps-3 pt-3 d-flex flex-column gap-3'>
                 <div className="d-flex gap-3">
-                    <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                    <div className='tutorial-popup-container justify-content-center'>
+                        <LanguageSelect language={languageValues[questionIndex] || "python"} setLanguage={handleLanguage} />
+                        <TutorialPopup text="Select Language" position='top' />
+
+                    </div>
+                    <div className='tutorial-popup-container justify-content-center'>
                     {
                         !testLoading ?
                         <Button arrow bordered onClick={()=>runCode()}>Run Code</Button>
                         :
                         <Button variant='secondary' className="d-flex align-items-center justify-content-center"><Loading className='fs-6 text-white' /></Button>
                     }
+                        <TutorialPopup text="Test Code Before Submitting" position='top' />
+                    </div>
                 </div>
 
                 <Row className='w-100 g-0'>
 
                     <Col className='col-12 col-md-8 p-0 order-1 order-md-0'>
-                        <div className='w-100 h-100 container-border border-end-0 pt-3 bg-black'>
+                        <div className='tutorial-popup-container justify-content-center w-100 h-100 container-border border-end-0 pt-3 bg-black'>
                             {
                                 languageValues.length > 0  &&
                                 <CodeEditor
@@ -123,33 +131,41 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
                                 protectedLines={protectedLines}
                                 />
                             }
+                            <TutorialPopup text="Write your code here" position='top' />
                         </div>
                     </Col>
 
                     <Col className='col-12 col-md-4'>
                         <div className='h-100 w-100 d-flex flex-column justify-content-start align-items-stretch'>
-                            <div className='h-100 w-100 d-flex flex-column'>
+                            
+                            <div className='tutorial-popup-container h-100 w-100 d-flex flex-column justify-content-center'>
                                 <p className='w-100 text-center mb-0 bg-primary py-1'>Input</p>
                                 <textarea className='h-100 w-100 textarea-input p-2 container-border'
                                 value={inputValues[questionIndex]} onChange={(e)=>handleInput(e)}
                                 placeholder='>> Your Input Here'
                                 ></textarea>
+                                <TutorialPopup text="The input to your tested code" position='left' />
                             </div>
-                            <div className='h-100 w-100 d-flex flex-column'>
+
+                            <div className='tutorial-popup-container h-100 w-100 d-flex flex-column justify-content-center'>
                                 <p className='w-100 text-center mb-0 bg-primary py-1'>Output</p>
                                 <textarea className='h-100 w-100 textarea-input p-2 container-border'
                                 readOnly value={outputValues[questionIndex]}
                                 placeholder='>> Your Output Here'
                                 ></textarea>
+                                <TutorialPopup text="The output of your tested code" position='left' />
                             </div>
+
                         </div>
                     </Col>
                 </Row>
+                <div className='tutorial-popup-container justify-content-center'>
                 {
                     !resultLoading ?
                     <Button
                     className="w-100 fs-5"
                     arrow
+                    variant={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex) ? "secondary" : "primary"}
                     disabled={codeValues[questionIndex]==="" || solvedQuestions.includes(questionIndex)}
                     onClick={async ()=>{
                         setResultLoading(true);
@@ -163,6 +179,8 @@ function CodeSubmit({visible,questions,onSubmit,questionIndex=0,solvedQuestions=
                     </Button>
 
                 }
+                <TutorialPopup text="Submit your answer" position='top' />
+                </div>
             </div>
         </div>
     );
