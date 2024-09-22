@@ -93,7 +93,7 @@ function Home({}) {
                 <>
                     <h1 className='fw-bold'>Choose Game</h1>
 
-                    <Row className='mt-3 g-3'>
+                    <Row className='mt-3 g-3 justify-content-center'>
                     {
                         games.map((game)=>
                         

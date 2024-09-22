@@ -8,9 +8,10 @@ export const games = [
         title:"Fastest Solve",
         code:"fastest",
         desc:"Be the first to solve the question to gain a point! Player with the most points wins!"
+    },
+    {
+        title:"Bingo!",
+        code:"bingo",
+        desc:"Solve a complete line of problems from the grid to win!"
     }
 ]
-
-export const achievements = {
-    
-}

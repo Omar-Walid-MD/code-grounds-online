@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { games } from '../Games/games';
 import Classic from "./Games/Classic";
 import Fastest from "./Games/Fastest";
+import Bingo from './Games/Bingo';
 
 function Play({}) {
 
@@ -23,6 +24,9 @@ function Play({}) {
             :
             gameMode === "fastest" ?
             <Fastest />
+            :
+            gameMode === "bingo" ?
+            <Bingo />
             :
             "" 
         }

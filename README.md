@@ -1,70 +1,65 @@
-# Getting Started with Create React App
+# Code Grounds Online
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Website URL
 
-## Available Scripts
+Visit the live demo: [Code Grounds Online](code-grounds-online.netlify.app)
 
-In the project directory, you can run:
+## Project Overview
 
-### `npm start`
+Code Grounds Online is a competitive programming website where users compete in solving programming problems in various fast-paced game modes.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Technologies Used
+- **Frontend**: React
+- **Styling**: CSS, Bootstrap
+- **State Management**: Redux
+- **Form Management**: Yup
+- **Routing**: React Router
+- **Backend**: Node.js, Express.js, Socket.io
+- **Database**: Firebase
 
-### `npm test`
+## Pages
+- **Home**: Home page with an entry form or game mode selection if the player is logged in.
+- **Waiting**: Shows the players waiting and how much time is left until the game starts.
+- **Play**: Runs the game and all its interface with the selected game mode.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## How to Install and Run the Project Locally
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+If you wish to run **Code Grounds Online** on your local machine, follow these steps:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Omar-Walid-MD/code-grounds-online.git
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Navigate into the project directory:
+   ```bash
+   cd code-grounds-online
+   ```
 
-### `npm run eject`
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Start the development server:
+   ```bash
+   npm start
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+5. Open your browser and visit `http://localhost:3000` to see the project in action.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+6. Setup a Firebase Project and create a Realtime Database
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+7. Add Email/Password and Google User Authentications
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+8. Create .env with the following properties and fill in the values from your Firebase client
+    ```
+    REACT_APP_FIREBASE_API_KEY=value
+    REACT_APP_FIREBASE_AUTH_DOMAIN=value
+    REACT_APP_FIREBASE_PROJECT_ID=value
+    REACT_APP_FIREBASE_STORAGE_BUCKET=value
+    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=value
+    REACT_APP_FIREBASE_APP_ID=value
+    ```

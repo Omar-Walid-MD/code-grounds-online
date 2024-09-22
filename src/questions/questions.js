@@ -320,8 +320,169 @@ const questions = [
             "yes",
             "no"
         ]
-    }   
+    },
+    {
+        "title": "Count Words",
+        "question": "Given a string of words separated by spaces, return the number of words.",
+        "testInputs": [
+            "hello world",
+            "openai is amazing",
+            "this is a test string",
+            "one two three"
+        ],
+        "outputs": [
+            "2",
+            "3",
+            "5",
+            "3"
+        ]
+    },
+    {
+        "title": "Sum of Squares",
+        "question": "Given a list of integers separated by spaces, return the sum of their squares.",
+        "testInputs": [
+            "1 2 3 4",
+            "5 5 5",
+            "10",
+            "-3 -4"
+        ],
+        "outputs": [
+            "30",
+            "75",
+            "100",
+            "25"
+        ]
+    },
+    {
+        "title": "Remove Duplicates",
+        "question": "Given a string, return a new string with all duplicate characters removed, keeping only the first occurrence.",
+        "testInputs": [
+            "banana",
+            "abcabc",
+            "hello",
+            "programming"
+        ],
+        "outputs": [
+            "ban",
+            "abc",
+            "helo",
+            "progamin"
+        ]
+    },
+    {
+        "title": "Find Median",
+        "question": "Given a list of integers separated by spaces, return the median of the list. If the list has an even number of elements, return the average of the two middle numbers.",
+        "testInputs": [
+            "1 2 3 4 5",
+            "10 20 30 40",
+            "1 2",
+            "7 8 9 10"
+        ],
+        "outputs": [
+            "3",
+            "25",
+            "1.5",
+            "8.5"
+        ]
+    },
+    {
+        "title": "Count Consonants",
+        "question": "Given a string, return the number of consonants (letters that are not vowels).",
+        "testInputs": [
+            "hello world",
+            "programming",
+            "openai",
+            "code"
+        ],
+        "outputs": [
+            "7",
+            "8",
+            "3",
+            "2"
+        ]
+    },
+    {
+        "title": "Sum of Odd Numbers",
+        "question": "Given a list of integers separated by spaces, return the sum of the odd numbers.",
+        "testInputs": [
+            "1 2 3 4 5",
+            "6 7 8 9",
+            "0 2 4 6",
+            "11 22 33"
+        ],
+        "outputs": [
+            "9",
+            "16",
+            "0",
+            "44"
+        ]
+    },
+    {
+        "title": "Check Palindromic Number",
+        "question": "Given an integer, return 'yes' if the number is a palindrome, and 'no' otherwise. A palindromic number reads the same forward and backward.",
+        "testInputs": [
+            "121",
+            "123",
+            "1001",
+            "45654"
+        ],
+        "outputs": [
+            "yes",
+            "no",
+            "yes",
+            "yes"
+        ]
+    },
+    {
+        "title": "String Rotation",
+        "question": "Given a string and an integer n, return the string rotated n positions to the right.",
+        "testInputs": [
+            "hello 2",
+            "world 3",
+            "openai 1",
+            "abcde 4"
+        ],
+        "outputs": [
+            "lohel",
+            "rldwo",
+            "aiopen",
+            "bcdea"
+        ]
+    },
+    {
+        "title": "LCM of Two Numbers",
+        "question": "Given two integers, return their least common multiple (LCM).",
+        "testInputs": [
+            "4 6",
+            "15 20",
+            "7 3",
+            "8 12"
+        ],
+        "outputs": [
+            "12",
+            "60",
+            "21",
+            "24"
+        ]
+    },
+    {
+        "title": "Check Prime",
+        "question": "Given an integer, return 'yes' if the number is prime, and 'no' otherwise. A prime number is a number greater than 1 that has no divisors other than 1 and itself.",
+        "testInputs": [
+            "2",
+            "4",
+            "13",
+            "25"
+        ],
+        "outputs": [
+            "yes",
+            "no",
+            "yes",
+            "no"
+        ]
+    }
 ];
+
 
 function getQuestions(n)
 {

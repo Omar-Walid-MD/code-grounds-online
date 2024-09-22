@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const {Server} = require("socket.io");
-const { getQuestions } = require("../src/questions/questions");
+const { getQuestions, questions } = require("../src/questions/questions");
 const uuid4 = require("uuid").v4;
 
 const app = express();
@@ -41,6 +41,12 @@ let roomInitialUserData = {
     state: {
       solvedQuestions: []
     }
+  },
+  bingo: {
+    online: true,
+    state: {
+      solvedQuestions: []
+    }
   }
 }
 
@@ -51,7 +57,10 @@ let roomData = {
   fastest: {
     fullTime: 15 * 60,
   
-  }
+  },
+  bingo: {
+    fullTime: 15 * 60,
+  },
 }
 
 
@@ -169,7 +178,8 @@ io.on("connection",(socket)=>{
 
     const room = rooms.find((r) => r.id === data.roomId);
     const update = room.gameMode==="classic" ? {questions:getQuestions(5)}
-    : room.gameMode==="fastest" ? {questions:getQuestions(5),questionIndex:0,untilNextQuestion:null} : {}
+    : room.gameMode==="fastest" ? {questions:getQuestions(5),questionIndex:0,untilNextQuestion:null}
+    : room.gameMode==="bingo" ? {questions:getQuestions(25)} : {};
 
     if(room && room.state !== "running")
     {
