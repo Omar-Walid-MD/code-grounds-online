@@ -2,7 +2,7 @@
 
 ## Website URL
 
-Visit the live demo: [Code Grounds Online](code-grounds-online.netlify.app)
+Visit the live demo: [Code Grounds Online](https://code-grounds-online.netlify.app)
 
 ## Project Overview
 
